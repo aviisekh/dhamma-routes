@@ -75,6 +75,23 @@ export default function App() {
     return () => media.removeEventListener('change', listener);
   }, []);
 
+  // Global Escape key handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (selectedCenter) {
+          setSelectedCenter(null);
+        } else if (sourceCity || targetCenter) {
+          setSourceCity('');
+          setTargetCenter('');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCenter, sourceCity, targetCenter]);
+
 
   const handleThemeToggle = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -225,6 +242,11 @@ export default function App() {
       <CenterDetailsDrawer 
         center={selectedCenter} 
         onClose={() => setSelectedCenter(null)} 
+        sourceCity={sourceCity}
+        setSourceCity={setSourceCity}
+        setTargetCenter={setTargetCenter}
+        setIsMobileRoutingOpen={setIsMobileRoutingOpen}
+        setIsRightCollapsed={setIsRightCollapsed}
       />
     </div>
   );

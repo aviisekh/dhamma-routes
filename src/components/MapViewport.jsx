@@ -149,7 +149,7 @@ export default function MapViewport({
   const isInitialRenderRef = useRef(true);
 
   // Legend Collapse State
-  const [isLegendCollapsed, setIsLegendCollapsed] = useState(false);
+  const [isLegendCollapsed, setIsLegendCollapsed] = useState(true);
 
   // Visibility States for Map Layers
   const [showCenters, setShowCenters] = useState(true);

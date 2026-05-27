@@ -1,8 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { CITIES } from '../constants/routing';
 
-export default function CenterDetailsDrawer({ center, onClose }) {
+export default function CenterDetailsDrawer({ 
+  center, 
+  onClose,
+  sourceCity,
+  setSourceCity,
+  setTargetCenter,
+  setIsMobileRoutingOpen,
+  setIsRightCollapsed
+}) {
   const drawerRef = useRef(null);
   const [copied, setCopied] = useState(false);
+
 
   // Focus the drawer for accessibility and handle ESC key to close
   useEffect(() => {
@@ -59,11 +69,15 @@ export default function CenterDetailsDrawer({ center, onClose }) {
   const maleRes = center ? parseInt(center.residence_capacity_male) || 0 : 0;
   const femaleRes = center ? parseInt(center.residence_capacity_female) || 0 : 0;
 
-  const showCapacity = maleHall > 0 || femaleHall > 0 || maleRes > 0 || femaleRes > 0;
+  const totalHall = maleHall + femaleHall;
+  const totalRes = maleRes + femaleRes;
 
-  const getCapacityPercent = (value, max = 150) => {
+  const showCapacity = totalHall > 0 || totalRes > 0;
+
+  const getCapacityPercent = (value, total) => {
+    if (total <= 0) return 0;
     const parsed = parseInt(value) || 0;
-    return Math.min(100, (parsed / max) * 100);
+    return (parsed / total) * 100;
   };
 
   const handleCopyContact = () => {
@@ -88,8 +102,18 @@ export default function CenterDetailsDrawer({ center, onClose }) {
           <button className="close-btn" onClick={onClose} aria-label="Close details">&times;</button>
           <div className="drawer-body">
             <div className="drawer-center-header">
-              <h2>{center.center_name}</h2>
-              <div className="drawer-center-dhamma">☸️ {center.center_dhamma_name || 'Dhamma Center'}</div>
+              <div className="drawer-header-left">
+                <h2>{center.center_name}</h2>
+                <span className="drawer-center-dhamma">☸️ {center.center_dhamma_name || 'Dhamma Center'}</span>
+              </div>
+              <a 
+                href={center.center_url} 
+                target="_blank" 
+                className="btn-apply-course" 
+                rel="noopener noreferrer"
+              >
+                Apply for Course
+              </a>
             </div>
             
             <div className="drawer-grid">
@@ -131,22 +155,6 @@ export default function CenterDetailsDrawer({ center, onClose }) {
                   </div>
                 </div>
                 
-                <div className="info-row">
-                  <div className="info-row-icon">📅</div>
-                  <div className="info-row-body">
-                    <h5>Established</h5>
-                    <p>{center.established_date || 'N/A'}</p>
-                  </div>
-                </div>
-                
-                <div className="info-row">
-                  <div className="info-row-icon">🛕</div>
-                  <div className="info-row-body">
-                    <h5>Pagoda Facilities</h5>
-                    <p>{hasPagoda ? 'Yes, pagoda facility is available for meditation.' : isUnderConstruction ? 'Pagoda is currently under construction.' : 'No pagoda facility.'}</p>
-                  </div>
-                </div>
-                
                 {center.remarks && (
                   <div className="remarks-box">
                     <strong>⚠️ Important Remarks</strong>
@@ -155,73 +163,123 @@ export default function CenterDetailsDrawer({ center, onClose }) {
                 )}
               </div>
               
-              <div className="drawer-capacity-info">
-                <h4 className="drawer-section-title">Capacity Stats</h4>
-                
-                {showCapacity ? (
-                  <div className="capacity-card">
-                    <div className="capacity-bars-container">
+              <div className="drawer-sidebar-info">
+                {/* Quick Info Grid */}
+                <div className="quick-stats-grid">
+                  <div className="quick-stat-card">
+                    <span className="stat-icon">📅</span>
+                    <div className="stat-body">
+                      <span className="stat-label">Established</span>
+                      <span className="stat-value">{center.established_date || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="quick-stat-card">
+                    <span className="stat-icon">🛕</span>
+                    <div className="stat-body">
+                      <span className="stat-label">Pagoda</span>
+                      <span className="stat-value" title={hasPagoda ? 'Available' : isUnderConstruction ? 'Under Construction' : 'None'}>
+                        {hasPagoda ? 'Available' : isUnderConstruction ? 'Under Construction' : 'None'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="capacity-section">
+                  <h4 className="drawer-section-title">Capacity Stats</h4>
+                  
+                  {showCapacity ? (
+                    <div className="capacity-card-compact">
                       {(maleHall > 0 || femaleHall > 0) && (
-                        <>
-                          <div className="capacity-bar-group">
-                            <div className="capacity-bar-header">
-                              <span className="capacity-label">🧘‍♂️ Dhamma Hall (Male)</span>
-                              <span>{maleHall} Seats</span>
+                        <div className="capacity-group-compact">
+                          <h6 className="capacity-group-title">🧘 Dhamma Hall</h6>
+                          <div className="capacity-bars-row">
+                            <div className="capacity-bar-compact">
+                              <div className="capacity-bar-info">
+                                <span>Male</span>
+                                <strong>{maleHall}</strong>
+                              </div>
+                              <div className="capacity-bar-track-compact">
+                                <div className="capacity-bar-fill-compact" style={{ width: `${getCapacityPercent(maleHall, totalHall)}%` }}></div>
+                              </div>
                             </div>
-                            <div className="capacity-bar-track">
-                              <div className="capacity-bar-fill" style={{ width: `${getCapacityPercent(maleHall)}%` }}></div>
+                            <div className="capacity-bar-compact">
+                              <div className="capacity-bar-info">
+                                <span>Female</span>
+                                <strong>{femaleHall}</strong>
+                              </div>
+                              <div className="capacity-bar-track-compact">
+                                <div className="capacity-bar-fill-compact female" style={{ width: `${getCapacityPercent(femaleHall, totalHall)}%` }}></div>
+                              </div>
                             </div>
                           </div>
-                          <div className="capacity-bar-group">
-                            <div className="capacity-bar-header">
-                              <span className="capacity-label" style={{ color: 'var(--color-accent-hover)' }}>🧘‍♀️ Dhamma Hall (Female)</span>
-                              <span>{femaleHall} Seats</span>
-                            </div>
-                            <div className="capacity-bar-track">
-                              <div className="capacity-bar-fill female" style={{ width: `${getCapacityPercent(femaleHall)}%` }}></div>
-                            </div>
-                          </div>
-                        </>
+                        </div>
                       )}
                       
                       {(maleRes > 0 || femaleRes > 0) && (
-                        <>
-                          <div className="capacity-bar-group">
-                            <div className="capacity-bar-header">
-                              <span className="capacity-label">🏠 Residence (Male)</span>
-                              <span>{maleRes} Rooms</span>
+                        <div className="capacity-group-compact">
+                          <h6 className="capacity-group-title">🏠 Residence</h6>
+                          <div className="capacity-bars-row">
+                            <div className="capacity-bar-compact">
+                              <div className="capacity-bar-info">
+                                <span>Male</span>
+                                <strong>{maleRes}</strong>
+                              </div>
+                              <div className="capacity-bar-track-compact">
+                                <div className="capacity-bar-fill-compact" style={{ width: `${getCapacityPercent(maleRes, totalRes)}%` }}></div>
+                              </div>
                             </div>
-                            <div className="capacity-bar-track">
-                              <div className="capacity-bar-fill" style={{ width: `${getCapacityPercent(maleRes)}%` }}></div>
+                            <div className="capacity-bar-compact">
+                              <div className="capacity-bar-info">
+                                <span>Female</span>
+                                <strong>{femaleRes}</strong>
+                              </div>
+                              <div className="capacity-bar-track-compact">
+                                <div className="capacity-bar-fill-compact female" style={{ width: `${getCapacityPercent(femaleRes, totalRes)}%` }}></div>
+                              </div>
                             </div>
                           </div>
-                          <div className="capacity-bar-group">
-                            <div className="capacity-bar-header">
-                              <span className="capacity-label" style={{ color: 'var(--color-accent-hover)' }}>🏠 Residence (Female)</span>
-                              <span>{femaleRes} Rooms</span>
-                            </div>
-                            <div className="capacity-bar-track">
-                              <div className="capacity-bar-fill female" style={{ width: `${getCapacityPercent(femaleRes)}%` }}></div>
-                            </div>
-                          </div>
-                        </>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Capacity data not registered for this center.</p>
-                )}
-                
-                <div className="drawer-actions">
-                  <a 
-                    href={center.center_url} 
-                    target="_blank" 
-                    className="btn btn-primary" 
-                    rel="noopener noreferrer"
-                  >
-                    ☸️ Apply for Course
-                  </a>
+                  ) : (
+                    <p className="no-capacity-text">Capacity data not registered.</p>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Transit Route Finder Section */}
+            <div className="drawer-route-finder-compact">
+              <div className="route-finder-info">
+                <strong>🗺️ Route Planner</strong>
+                <span>Find routes from Indian departure hubs</span>
+              </div>
+              <div className="route-finder-select-wrapper">
+                <select 
+                  id="drawer-select-source" 
+                  className="planner-select-compact"
+                  value=""
+                  onChange={(e) => {
+                    const selectedHub = e.target.value;
+                    if (selectedHub) {
+                      setSourceCity(selectedHub);
+                      setTargetCenter(center.center_name);
+                      // Open the routing panel
+                      if (window.innerWidth <= 992) {
+                        if (setIsMobileRoutingOpen) setIsMobileRoutingOpen(true);
+                      } else {
+                        if (setIsRightCollapsed) setIsRightCollapsed(false);
+                      }
+                      // Close the drawer
+                      onClose();
+                    }
+                  }}
+                >
+                  <option value="">Choose Starting City...</option>
+                  {Object.values(CITIES).map(city => (
+                    <option key={city.name} value={city.name}>{city.label}</option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

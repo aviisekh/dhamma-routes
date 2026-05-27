@@ -1342,7 +1342,7 @@ input:checked + .slider:before {
     transform: translateY(100%);
     transition: transform var(--transition-normal);
     overflow-y: auto;
-    padding: 30px 40px;
+    padding: 24px 30px;
 }
 
 .details-drawer[aria-hidden="false"] .drawer-content {
@@ -1372,15 +1372,15 @@ input:checked + .slider:before {
 
 .close-btn {
     position: absolute;
-    right: 24px;
-    top: 24px;
+    right: 20px;
+    top: 20px;
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: 24px;
     color: var(--text-muted);
     cursor: pointer;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1395,37 +1395,263 @@ input:checked + .slider:before {
 
 /* Detailed profiles */
 .drawer-center-header {
-    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 16px;
-    padding-right: 40px;
+    padding-bottom: 14px;
+    padding-right: 36px;
     text-align: left;
 }
 
+.drawer-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .drawer-center-header h2 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 4px;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--text-primary);
 }
 
 .drawer-center-dhamma {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-accent-hover);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    opacity: 0.9;
+}
+
+.btn-apply-course {
+    background-color: var(--color-primary);
+    color: #ffffff !important;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(45, 90, 39, 0.15);
+}
+
+.btn-apply-course:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.25);
 }
 
 .drawer-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
 }
 
 @media (min-width: 600px) {
     .drawer-grid {
-        grid-template-columns: 1.2fr 0.8fr;
+        grid-template-columns: 1.15fr 0.85fr;
     }
+}
+
+/* Quick Stats Grid */
+.quick-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.quick-stat-card {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    min-width: 0;
+}
+
+.stat-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.stat-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* Compact Capacity */
+.capacity-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.capacity-card-compact {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.capacity-group-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.capacity-group-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.capacity-bars-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.capacity-bar-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.capacity-bar-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-secondary);
+    line-height: 1;
+}
+
+.capacity-bar-info span {
+    opacity: 0.8;
+}
+
+.capacity-bar-info strong {
+    color: var(--text-primary);
+}
+
+.capacity-bar-track-compact {
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.capacity-bar-fill-compact {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 3px;
+    transition: width 1s ease-out;
+}
+
+.capacity-bar-fill-compact.female {
+    background-color: var(--color-accent);
+}
+
+.no-capacity-text {
+    color: var(--text-muted);
+    font-size: 11px;
+    margin: 0;
+}
+
+/* Compact Route Finder */
+.drawer-route-finder-compact {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.route-finder-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.route-finder-info strong {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.route-finder-info span {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.route-finder-select-wrapper {
+    flex: 1;
+    min-width: 180px;
+    max-width: 260px;
+}
+
+.planner-select-compact {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition-fast);
+    cursor: pointer;
+}
+
+.planner-select-compact:focus {
+    border-color: var(--color-accent);
 }
 
 .drawer-section-title {
