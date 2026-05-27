@@ -2056,44 +2056,7 @@ input:checked + .slider:before {
    COLLAPSIBLE SIDEBARS & LEGEND STYLES
    ========================================================================== */
 
-/* Toggle Buttons inside sidebars */
-.sidebar-toggle-btn {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: none; /* Hidden on desktop */
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
 
-.sidebar-toggle-btn:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
-    transform: scale(1.05);
-}
-
-.sidebar-tab-toggle-btn {
-    background: transparent;
-    border: none;
-    border-left: 1px solid var(--border-color);
-    color: var(--text-muted);
-    display: none; /* Hidden on desktop */
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0 14px;
-    transition: all var(--transition-fast);
-}
-
-.sidebar-tab-toggle-btn:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
-}
 
 /* Border-positioned Toggle Buttons */
 .sidebar-border-toggle {
@@ -2101,17 +2064,17 @@ input:checked + .slider:before {
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-muted);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: var(--box-shadow-sm);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
     transition: all var(--transition-fast), left var(--transition-normal), right var(--transition-normal);
 }
 
@@ -2119,8 +2082,8 @@ input:checked + .slider:before {
     background: var(--color-accent-light);
     color: var(--color-accent-hover);
     border-color: var(--color-accent);
-    transform: translate(-50%, -50%) scale(1.1);
-    box-shadow: var(--box-shadow-md);
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .sidebar-border-toggle.toggle-left {
@@ -2132,12 +2095,16 @@ input:checked + .slider:before {
     transform: translate(0, -50%);
     border-left: none;
     border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
-    width: 20px;
-    height: 48px;
+    width: 24px;
+    height: 64px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.12);
 }
 
 .sidebar-border-toggle.toggle-left.collapsed:hover {
-    transform: translate(0, -50%) scale(1.05);
+    transform: translate(0, -50%) scale(1.08);
+    background: var(--color-accent-light);
+    color: var(--color-accent-hover);
+    border-color: var(--color-accent);
 }
 
 .sidebar-border-toggle.toggle-right {
@@ -2150,32 +2117,28 @@ input:checked + .slider:before {
     transform: translate(0, -50%);
     border-right: none;
     border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
-    width: 20px;
-    height: 48px;
+    width: 24px;
+    height: 64px;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.12);
 }
 
 .sidebar-border-toggle.toggle-right:hover {
     background: var(--color-accent-light);
     color: var(--color-accent-hover);
     border-color: var(--color-accent);
-    transform: translate(50%, -50%) scale(1.1);
-    box-shadow: var(--box-shadow-md);
+    transform: translate(50%, -50%) scale(1.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .sidebar-border-toggle.toggle-right.collapsed:hover {
-    transform: translate(0, -50%) scale(1.05);
+    transform: translate(0, -50%) scale(1.08);
+    background: var(--color-accent-light);
+    color: var(--color-accent-hover);
+    border-color: var(--color-accent);
 }
 
 @media (max-width: 992px) {
     .sidebar-border-toggle {
-        display: none !important;
-    }
-    
-    .sidebar-toggle-btn {
-        display: none !important;
-    }
-    
-    .sidebar-tab-toggle-btn {
         display: none !important;
     }
     

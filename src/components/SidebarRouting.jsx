@@ -12,9 +12,7 @@ export default function SidebarRouting({
   setTargetCenter,
   onSelectCenter,
   isOpen,
-  onClose,
-  isCollapsed,
-  onToggleCollapse
+  onClose
 }) {
   const [activeTab, setActiveTab] = useState('routing');
   const [routeInfo, setRouteInfo] = useState(null);
@@ -25,14 +23,6 @@ export default function SidebarRouting({
       setMobileState('peek');
     }
   }, [isOpen]);
-
-  const handleCollapseClick = () => {
-    if (window.innerWidth <= 992) {
-      if (onClose) onClose();
-    } else {
-      if (onToggleCollapse) onToggleCollapse();
-    }
-  };
 
 
   // Re-calculate route whenever city or center selection changes
@@ -155,16 +145,6 @@ export default function SidebarRouting({
             aria-selected={activeTab === 'info'}
           >
             Useful Info
-          </button>
-          <button 
-            className="sidebar-tab-toggle-btn"
-            onClick={handleCollapseClick}
-            title="Collapse panel"
-            aria-label="Collapse panel"
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
           </button>
         </div>
 

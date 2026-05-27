@@ -141,8 +141,6 @@ export default function App() {
           setStatusFilter={setStatusFilter}
           isOpen={isMobileCentersOpen}
           onClose={() => setIsMobileCentersOpen(false)}
-          isCollapsed={isLeftCollapsed}
-          onToggleCollapse={() => setIsLeftCollapsed(!isLeftCollapsed)}
         />
         
         {/* Center Panel: Map */}
@@ -170,8 +168,6 @@ export default function App() {
           onSelectCenter={setSelectedCenter}
           isOpen={isMobileRoutingOpen}
           onClose={() => setIsMobileRoutingOpen(false)}
-          isCollapsed={isRightCollapsed}
-          onToggleCollapse={() => setIsRightCollapsed(!isRightCollapsed)}
         />
 
         {/* Unified Border Toggle Buttons */}
@@ -181,7 +177,7 @@ export default function App() {
           title={isLeftCollapsed ? "Expand Centers List" : "Collapse Centers List"}
           aria-label={isLeftCollapsed ? "Expand Centers List" : "Collapse Centers List"}
         >
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3">
             {isLeftCollapsed ? (
               <polyline points="9 18 15 12 9 6"></polyline>
             ) : (
@@ -196,7 +192,7 @@ export default function App() {
           title={isRightCollapsed ? "Expand Route Planner" : "Collapse Route Planner"}
           aria-label={isRightCollapsed ? "Expand Route Planner" : "Collapse Route Planner"}
         >
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="3">
             {isRightCollapsed ? (
               <polyline points="15 18 9 12 15 6"></polyline>
             ) : (
