@@ -297,6 +297,12 @@ export default function MapViewport({
         className: 'center-map-tooltip'
       });
 
+      // Close tooltip initially if map zoom is low
+      const currentZoom = mapRef.current ? mapRef.current.getZoom() : 7;
+      if (currentZoom < 9) {
+        marker.closeTooltip();
+      }
+
       marker.on('click', () => {
         if (onSelectCenter) onSelectCenter(center);
       });
@@ -306,6 +312,17 @@ export default function MapViewport({
 
     centerMarkersRef.current = newMarkers;
   }, [centers, allCenters, onSelectCenter, sourceCity, targetCenter, selectedCenter, showCenters]);
+
+  // 3b. Sync tooltip visibility programmatically based on zoom level
+  useEffect(() => {
+    centerMarkersRef.current.forEach(({ marker }) => {
+      if (zoomLevel >= 9) {
+        marker.openTooltip();
+      } else {
+        marker.closeTooltip();
+      }
+    });
+  }, [zoomLevel, centers]);
 
   // 4. Handle Center flying details
   useEffect(() => {

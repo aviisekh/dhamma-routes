@@ -2234,7 +2234,7 @@ input:checked + .slider:before {
     border-top-color: transparent;
 }
 
-/* Center Map Tooltip - Zoom-dependent Visibility */
+/* Center Map Tooltip styling */
 .leaflet-tooltip.center-map-tooltip {
     background-color: var(--bg-secondary) !important;
     border: 1px solid var(--border-color) !important;
@@ -2245,17 +2245,10 @@ input:checked + .slider:before {
     padding: 4px 8px !important;
     border-radius: 4px !important;
     box-shadow: var(--box-shadow-sm) !important;
-    opacity: 0 !important;
-    transition: opacity 0.2s ease-in-out !important;
-    pointer-events: none !important;
 }
 
 .leaflet-tooltip-top.center-map-tooltip::before {
     border-top-color: var(--border-color) !important;
-}
-
-.high-zoom .leaflet-tooltip.center-map-tooltip {
-    opacity: 0.95 !important;
 }
 
 
