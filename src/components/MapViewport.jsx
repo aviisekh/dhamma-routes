@@ -156,6 +156,9 @@ export default function MapViewport({
   const [showBorders, setShowBorders] = useState(true);
   const [showIndianHubs, setShowIndianHubs] = useState(true);
 
+  // Zoom Level State
+  const [zoomLevel, setZoomLevel] = useState(7);
+
   // Invalidate Map layout size after sidebar transition completes
   useEffect(() => {
     if (mapRef.current) {
@@ -206,7 +209,16 @@ export default function MapViewport({
     });
     staticMarkersRef.current.borders = borderMarkers;
 
+    // Track zoom level to toggle label visibility
+    const handleZoom = () => {
+      setZoomLevel(leafletMap.getZoom());
+    };
+
+    leafletMap.on('zoomend', handleZoom);
+    handleZoom();
+
     return () => {
+      leafletMap.off('zoomend', handleZoom);
       leafletMap.remove();
       mapRef.current = null;
     };
@@ -277,6 +289,13 @@ export default function MapViewport({
         <div class="popup-dhamma">☸️ ${center.center_dhamma_name || 'Dhamma Center'}</div>
         <div class="popup-details">📍 ${center.extracted_city || 'Nepal'}</div>
       `);
+
+      marker.bindTooltip(center.center_name, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -15],
+        className: 'center-map-tooltip'
+      });
 
       marker.on('click', () => {
         if (onSelectCenter) onSelectCenter(center);
@@ -464,7 +483,7 @@ export default function MapViewport({
   }, [sourceCity, targetCenter, allCenters, centers, showIndianHubs, showBorders]);
 
   return (
-    <section className="map-container" id="map-section">
+    <section className={`map-container ${zoomLevel >= 11 ? 'high-zoom' : ''}`} id="map-section">
       <div id="map" ref={mapContainerRef}></div>
       
       {/* Legend Card Overlay */}
