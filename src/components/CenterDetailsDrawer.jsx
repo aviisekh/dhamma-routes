@@ -4,12 +4,29 @@ export default function CenterDetailsDrawer({ center, onClose }) {
   const drawerRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
-  // Focus the drawer for accessibility when it opens
+  // Focus the drawer for accessibility and handle ESC key to close
   useEffect(() => {
     if (center && drawerRef.current) {
       drawerRef.current.focus();
     }
   }, [center]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (center) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [center, onClose]);
+
 
   const hasPagoda = center && center.pagoda && center.pagoda.toLowerCase().includes('yes');
   const isUnderConstruction = center && center.remarks && center.remarks.toLowerCase().includes('under construction');
@@ -30,7 +47,7 @@ export default function CenterDetailsDrawer({ center, onClose }) {
         {phonePart && (
           <>
             <br />
-            <a href={`tel:${phone}`} className="call-link">📞 {phonePart}</a>
+            <a href={`tel:${phone}`} className="call-link">{phonePart}</a>
           </>
         )}
       </div>

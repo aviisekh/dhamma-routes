@@ -1570,26 +1570,44 @@ input:checked + .slider:before {
 }
 
 .copy-btn-inline {
-    background: none;
-    border: none;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     color: var(--text-muted);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 6px !important;
+    border-radius: 6px;
     transition: all var(--transition-fast);
     line-height: 1;
 }
 
 .copy-btn-inline:hover {
-    background-color: var(--border-color);
+    background-color: var(--border-color) !important;
     color: var(--text-primary);
+}
+
+.copy-btn-inline:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .copy-btn-inline svg {
     display: block;
+}
+
+.drawer-main-info .info-row {
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.drawer-main-info .info-row-body p {
+    margin: 2px 0 0 0;
+    font-size: 12.5px;
+    line-height: 1.4;
 }
 
 .remarks-box {
