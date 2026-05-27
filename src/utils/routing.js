@@ -1,4 +1,4 @@
-import { CITIES, BORDERS, COORDINATES_OVERRIDES } from '../constants/routing';
+import { INDIAN_CITIES, NEPAL_CITIES, BORDERS, COORDINATES_OVERRIDES } from '../constants/routing';
 
 
 export function getBestBorder(source, centerName) {
@@ -66,7 +66,7 @@ export function getBestBorder(source, centerName) {
 }
 
 export function getIndiaToBorderSegment(source, borderKey) {
-    const startCoord = [CITIES[source].lat, CITIES[source].lng];
+    const startCoord = [INDIAN_CITIES[source].lat, INDIAN_CITIES[source].lng];
     const endCoord = [BORDERS[borderKey].lat, BORDERS[borderKey].lng];
     
     let path = [startCoord, endCoord];
@@ -398,7 +398,153 @@ function getBezierPoints(start, end, curvature = 0.15) {
     return points;
 }
 
+export function getDomesticToCenterSegment(source, center) {
+    const startCoord = [NEPAL_CITIES[source].lat, NEPAL_CITIES[source].lng];
+    const endCoord = [center.latitude, center.longitude];
+    
+    let path = [startCoord, endCoord];
+    let mode = 'road';
+    let label = 'Highway Bus / Private Taxi';
+    let desc = '';
+    
+    const name = center.center_name;
+    const isKathmanduCenter = name.includes("Nepal Vipassana Center") || 
+                              name.includes("Kotdada") || 
+                              name.includes("Kirtipur") || 
+                              name.includes("Kakani") || 
+                              name.includes("Nakkhu");
+                              
+    if (source === 'Kathmandu') {
+        if (isKathmanduCenter) {
+            label = 'Local Taxi / Public Transit';
+            desc = 'The center is located in Kathmandu Valley. You can hire a local taxi or book a ride via local apps (Pathao / InDrive) from anywhere in Kathmandu (approx. 30-60 mins depending on traffic).';
+        } else if (name.includes("Pokhara")) {
+            mode = 'air';
+            label = 'Option A: Flight to Pokhara | Option B: Tourist Bus';
+            desc = '<strong>Option A (Air):</strong> Take a 25-minute flight from KTM Domestic Terminal to Pokhara International Airport, then taxi to Begnas Lake. <br><strong>Option B (Road):</strong> Board a tourist bus or shared Micro from Gongabu Bus Park to Pokhara (approx. 7-8 hours).';
+        } else if (name.includes("Chitwan")) {
+            label = 'Option A: Tourist Bus | Option B: Flight';
+            desc = '<strong>Option A (Road):</strong> Catch a daily tourist bus from Gongabu Bus Park or Kalanki to Bharatpur, Chitwan (approx. 5-6 hours). <br><strong>Option B (Air):</strong> Take a 20-minute flight from KTM to Bharatpur Airport.';
+        } else if (name.includes("Lumbini") || name.includes("Debdaha") || name.includes("Kapilvastu") || name.includes("Palpa")) {
+            mode = 'air';
+            label = 'Option A: Fly to Bhairahawa | Option B: Tourist Bus';
+            desc = '<strong>Option A (Air):</strong> Take a 35-minute domestic flight from KTM to Gautam Buddha International Airport (BWA) in Bhairahawa, then local taxi/bus to center. <br><strong>Option B (Road):</strong> Take a day/night tourist bus from Gongabu Bus Park to Bhairahawa/Lumbini (approx. 8-9 hours).';
+        } else if (name.includes("Lukla")) {
+            mode = 'air';
+            label = 'Scheduled STOL Flight from Kathmandu';
+            desc = 'Lukla is only accessible by air. Take a scheduled STOL flight from KTM domestic terminal to Tenzing-Hillary Airport (LUA) in Lukla (approx. 35 mins).';
+        } else if (name.includes("Purbanchal") || name.includes("Ilam")) {
+            mode = 'air';
+            label = 'Option A: Fly to Biratnagar/Bhadrapur | Option B: Overnight Bus';
+            desc = '<strong>Option A:</strong> Take a domestic flight to Biratnagar (45 mins) or Bhadrapur (45 mins) from Kathmandu, then local taxi/bus. <br><strong>Option B:</strong> Board an overnight deluxe bus from Gongabu Bus Park to Itahari/Kakarbhitta (10-12 hours).';
+        } else if (name.includes("Sudur Paschim")) {
+            mode = 'air';
+            label = 'Option A: Fly to Dhangadhi | Option B: Overnight Bus';
+            desc = '<strong>Option A:</strong> Take a domestic flight to Dhangadhi Airport (1 hr 15 mins), then taxi or local bus to Mahendranagar (approx. 1 hour). <br><strong>Option B:</strong> Take an overnight deluxe bus from Gongabu to Mahendranagar (approx. 14-15 hours).';
+        } else {
+            label = 'Tourist Bus / Domestic Flight';
+            desc = 'Proceed via domestic flight to the nearest regional airport, or board a long-distance bus from Gongabu Bus Park.';
+        }
+    } else if (source === 'Pokhara') {
+        if (name.includes("Pokhara")) {
+            label = 'Local Taxi / Begnas Lake Boat/Bus';
+            desc = 'The center is situated near Begnas Lake. Take a local bus from Prithvi Chowk to Begnas, or hire a direct taxi from Lakeside (approx. 45 mins, 20 km).';
+        } else if (isKathmanduCenter) {
+            mode = 'air';
+            label = 'Option A: Tourist Bus | Option B: Domestic Flight';
+            desc = '<strong>Option A (Road):</strong> Board a daily tourist bus from Tourist Bus Park (Lakeside) to Gongabu, Kathmandu (7-8 hours). <br><strong>Option B (Air):</strong> Take a 25-minute flight to Kathmandu (KTM) from Pokhara Airport.';
+        } else if (name.includes("Lumbini") || name.includes("Debdaha") || name.includes("Palpa") || name.includes("Kapilvastu")) {
+            label = 'Highway Bus via Siddhartha Highway';
+            desc = 'Take a local passenger bus or shared jeep from Pokhara heading south along the Siddhartha Highway towards Butwal/Bhairahawa (approx. 6-7 hours).';
+        } else if (name.includes("Chitwan")) {
+            label = 'Tourist Bus to Chitwan';
+            desc = 'Board a tourist bus or shared Micro from Pokhara Tourist Bus Park to Bharatpur/Chitwan (approx. 5-6 hours).';
+        } else {
+            label = 'Highway Bus / Transit via Kathmandu';
+            desc = 'Travel by road or air to Kathmandu or Butwal, then transfer to your destination center.';
+        }
+    } else if (source === 'Biratnagar') {
+        if (name.includes("Purbanchal")) {
+            label = 'Local Bus / Auto-rickshaw';
+            desc = 'Take a local bus or shared auto north from Biratnagar to Itahari (approx. 45 mins, 22 km). The center is in Itahari-8.';
+        } else if (name.includes("Ilam")) {
+            label = 'Shared Jeep via Mechi Highway';
+            desc = 'Take a shared jeep or bus from Biratnagar to Phikkal, Ilam (approx. 3-4 hours).';
+        } else if (isKathmanduCenter) {
+            mode = 'air';
+            label = 'Option A: Domestic Flight | Option B: Overnight Bus';
+            desc = 'Fly from Biratnagar Airport to Kathmandu (45 mins) or take an overnight bus along the East-West Highway (approx. 10-12 hours).';
+        } else {
+            label = 'Transit via Itahari / East-West Highway';
+            desc = 'Take a local bus or taxi to Itahari, then board a long-distance bus along the East-West Highway to your destination.';
+        }
+    } else if (source === 'Bhairahawa' || source === 'Butwal') {
+        if (name.includes("Lumbini")) {
+            label = 'Local Rickshaw / Taxi';
+            desc = 'Lumbini is nearby. Take a local auto-rickshaw or taxi directly to the Lumbini Vipassana Center (approx. 20-30 mins).';
+        } else if (name.includes("Kapilvastu")) {
+            label = 'Local Bus / Shared Jeep';
+            desc = 'Take a local bus heading west towards Taulihawa / Kapilvastu (approx. 1 hour).';
+        } else if (name.includes("Palpa")) {
+            label = 'Bus via Siddhartha Highway';
+            desc = 'Board a bus heading north to Tansen, Palpa (approx. 1.5 - 2 hours).';
+        } else if (name.includes("Pokhara")) {
+            label = 'Siddhartha Highway Bus';
+            desc = 'Take a bus heading north from Butwal Bus Park directly to Pokhara (approx. 5-6 hours).';
+        } else if (isKathmanduCenter) {
+            mode = 'air';
+            label = 'Option A: Domestic Flight | Option B: Tourist Bus';
+            desc = 'Fly to Kathmandu (KTM) from Bhairahawa Airport (35 mins) or catch a day/night bus to Kathmandu (8-9 hours).';
+        } else {
+            label = 'East-West Highway Bus';
+            desc = 'Board an express bus heading east or west along the East-West Highway from Butwal Bus Park.';
+        }
+    } else if (source === 'Nepalgunj') {
+        if (name.includes("Surkhetta")) {
+            label = 'Bus via Ratna Highway';
+            desc = 'Take a local bus or shared jeep north from Nepalgunj to Birendranagar, Surkhet (approx. 2.5 - 3 hours).';
+        } else if (name.includes("Dang")) {
+            label = 'Shared Jeep / Highway Bus';
+            desc = 'Board a bus or shared vehicle from Nepalgunj to Ghorahi, Dang (approx. 2.5 - 3 hours).';
+        } else if (name.includes("Sudur Paschim")) {
+            label = 'Highway Bus / Shared Jeep';
+            desc = 'Travel west along the East-West Highway to Mahendranagar (approx. 4-5 hours, 180 km).';
+        } else if (isKathmanduCenter) {
+            mode = 'air';
+            label = 'Option A: Domestic Flight | Option B: Overnight Bus';
+            desc = 'Take a 50-minute flight from Nepalgunj Airport to Kathmandu, or board an overnight deluxe bus (approx. 12-14 hours).';
+        } else {
+            label = 'Highway Bus / Transit';
+            desc = 'Proceed via Nepalgunj Bus Park along the East-West Highway to your destination.';
+        }
+    } else {
+        if (isKathmanduCenter) {
+            label = 'Tourist Bus to Kathmandu';
+            desc = `Board a long-distance bus from ${source} directly to Gongabu Bus Park, Kathmandu, then hire a taxi to the center.`;
+        } else {
+            label = 'Domestic Road Transit';
+            desc = `Hire a private taxi or take a local bus from ${source} to the Vipassana center. Contact the center for exact driving directions.`;
+        }
+    }
+    
+    return { path, mode, label, desc };
+}
+
 export function calculateFullRoute(source, center, centerName) {
+    if (NEPAL_CITIES[source]) {
+        const seg = getDomesticToCenterSegment(source, center);
+        const route = {
+            isDomestic: true,
+            segments: [seg]
+        };
+        route.segments.forEach(seg => {
+            if (seg.mode === 'air' && seg.path.length === 2) {
+                seg.path = getBezierPoints(seg.path[0], seg.path[1]);
+            }
+        });
+        return route;
+    }
+
     const borderKey = getBestBorder(source, centerName);
     if (!borderKey) return null;
     

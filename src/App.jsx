@@ -5,7 +5,7 @@ import MapViewport from './components/MapViewport';
 import SidebarRouting from './components/SidebarRouting';
 import CenterDetailsDrawer from './components/CenterDetailsDrawer';
 import { VIPASSANA_CENTERS } from './constants/centers';
-import { COORDINATES_OVERRIDES } from './constants/routing';
+import { COORDINATES_OVERRIDES, INDIAN_CITIES, NEPAL_CITIES } from './constants/routing';
 
 // Clean coordinates and apply geocoding overrides
 const INITIAL_CENTERS = VIPASSANA_CENTERS.map(c => {
@@ -41,6 +41,110 @@ export default function App() {
   const [selectedCenter, setSelectedCenter] = useState(null);
   const [sourceCity, setSourceCity] = useState('');
   const [targetCenter, setTargetCenter] = useState('');
+
+  // Geolocation States
+  const [userLocation, setUserLocation] = useState(null);
+  const [nearestHubs, setNearestHubs] = useState([]);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState(null);
+
+  // Distance helper (Haversine formula in km)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const handleLocationSuccess = (lat, lng) => {
+    setUserLocation({ lat, lng });
+    setLocationError(null);
+
+    // Nepal geographical bounding box coordinates
+    const isUserInNepal = lat >= 26.0 && lat <= 30.8 && lng >= 80.0 && lng <= 88.5;
+
+    const sortedIndia = Object.values(INDIAN_CITIES).map(city => {
+      const distance = calculateDistance(lat, lng, city.lat, city.lng);
+      return { ...city, distance, isNepal: false };
+    }).sort((a, b) => a.distance - b.distance);
+
+    const sortedNepal = Object.values(NEPAL_CITIES).map(city => {
+      const distance = calculateDistance(lat, lng, city.lat, city.lng);
+      return { ...city, distance, isNepal: true };
+    }).sort((a, b) => a.distance - b.distance);
+
+    // Combine all to get the overall sorted nearest hubs for display (top 3)
+    const sortedAll = [...sortedIndia, ...sortedNepal].sort((a, b) => a.distance - b.distance);
+    setNearestHubs(sortedAll.slice(0, 3));
+
+    // Choose default source city
+    if (isUserInNepal && sortedNepal.length > 0) {
+      setSourceCity(sortedNepal[0].name);
+    } else if (sortedIndia.length > 0) {
+      setSourceCity(sortedIndia[0].name);
+    } else if (sortedAll.length > 0) {
+      setSourceCity(sortedAll[0].name);
+    }
+  };
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setIsLocating(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        handleLocationSuccess(lat, lng);
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        let errorMsg = "Unable to retrieve location.";
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg = "Location permission denied.";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMsg = "Location information is unavailable.";
+        } else if (error.code === error.TIMEOUT) {
+          errorMsg = "Location request timed out.";
+        }
+        setLocationError(errorMsg);
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  // Check if location permission is already granted on mount
+  useEffect(() => {
+    if (navigator.geolocation && navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' })
+        .then((result) => {
+          if (result.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                handleLocationSuccess(position.coords.latitude, position.coords.longitude);
+              },
+              null,
+              { enableHighAccuracy: true, timeout: 5000 }
+            );
+          }
+        })
+        .catch((err) => {
+          console.log("Permission query error on load:", err);
+        });
+    }
+  }, []);
 
   // 4. Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -155,6 +259,10 @@ export default function App() {
           theme={theme}
           isLeftCollapsed={isLeftCollapsed}
           isRightCollapsed={isRightCollapsed}
+          userLocation={userLocation}
+          nearestHubs={nearestHubs}
+          detectLocation={detectLocation}
+          isLocating={isLocating}
         />
         
         {/* Right Sidebar: Route Planner & Guides */}
@@ -168,6 +276,11 @@ export default function App() {
           onSelectCenter={setSelectedCenter}
           isOpen={isMobileRoutingOpen}
           onClose={() => setIsMobileRoutingOpen(false)}
+          userLocation={userLocation}
+          nearestHubs={nearestHubs}
+          isLocating={isLocating}
+          locationError={locationError}
+          detectLocation={detectLocation}
         />
 
         {/* Unified Border Toggle Buttons */}

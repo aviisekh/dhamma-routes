@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { CITIES, BORDERS } from '../constants/routing';
+import { INDIAN_CITIES, NEPAL_CITIES, BORDERS } from '../constants/routing';
 import { calculateFullRoute } from '../utils/routing';
 
 // Helper to build custom HTML markers
@@ -136,7 +136,11 @@ export default function MapViewport({
   targetCenter,
   theme,
   isLeftCollapsed,
-  isRightCollapsed
+  isRightCollapsed,
+  userLocation,
+  nearestHubs,
+  detectLocation,
+  isLocating
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -147,6 +151,8 @@ export default function MapViewport({
   const staticMarkersRef = useRef({ cities: [], borders: [] });
   const activePolylinesRef = useRef([]);
   const isInitialRenderRef = useRef(true);
+  const userMarkerRef = useRef(null);
+  const nearestHubConnectorRef = useRef(null);
 
   // Legend Collapse State
   const [isLegendCollapsed, setIsLegendCollapsed] = useState(true);
@@ -155,9 +161,24 @@ export default function MapViewport({
   const [showCenters, setShowCenters] = useState(true);
   const [showBorders, setShowBorders] = useState(true);
   const [showIndianHubs, setShowIndianHubs] = useState(true);
+  const [showNepalHubs, setShowNepalHubs] = useState(true);
 
   // Zoom Level State
   const [zoomLevel, setZoomLevel] = useState(7);
+
+  // Sync map layer visibility defaults based on user location (country check)
+  useEffect(() => {
+    if (userLocation) {
+      const isUserInNepal = userLocation.lat >= 26.0 && userLocation.lat <= 30.8 && userLocation.lng >= 80.0 && userLocation.lng <= 88.5;
+      if (isUserInNepal) {
+        setShowNepalHubs(true);
+        setShowIndianHubs(false);
+      } else {
+        setShowNepalHubs(false);
+        setShowIndianHubs(true);
+      }
+    }
+  }, [userLocation]);
 
   // Invalidate Map layout size after sidebar transition completes
   useEffect(() => {
@@ -183,7 +204,7 @@ export default function MapViewport({
 
     // Plot Static Cities
     const cityMarkers = [];
-    Object.values(CITIES).forEach(city => {
+    Object.values(INDIAN_CITIES).forEach(city => {
       const marker = L.marker([city.lat, city.lng], {
         icon: createMarkerIcon('city', 28)
       }).addTo(leafletMap);
@@ -192,8 +213,21 @@ export default function MapViewport({
       marker.on('click', () => {
         setSourceCity(city.name);
       });
-      cityMarkers.push({ name: city.name, marker });
+      cityMarkers.push({ name: city.name, marker, isDomestic: false });
     });
+
+    Object.values(NEPAL_CITIES).forEach(city => {
+      const marker = L.marker([city.lat, city.lng], {
+        icon: createMarkerIcon('city', 28)
+      }).addTo(leafletMap);
+      
+      marker.bindPopup(`<h4>${city.label}</h4><p class="popup-details">Nepal Departure & Transit Hub</p>`);
+      marker.on('click', () => {
+        setSourceCity(city.name);
+      });
+      cityMarkers.push({ name: city.name, marker, isDomestic: true });
+    });
+
     staticMarkersRef.current.cities = cityMarkers;
 
     // Plot Static Borders
@@ -324,6 +358,109 @@ export default function MapViewport({
     });
   }, [zoomLevel, centers]);
 
+  // 3c. Sync User Location GPS marker, nearest hub connector line, and hub highlights
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clean up existing user marker
+    if (userMarkerRef.current) {
+      mapRef.current.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+
+    // Clean up existing nearest hub connector line
+    if (nearestHubConnectorRef.current) {
+      mapRef.current.removeLayer(nearestHubConnectorRef.current);
+      nearestHubConnectorRef.current = null;
+    }
+
+    if (userLocation) {
+      // 1. Draw User Location GPS marker
+      const userIcon = L.divIcon({
+        html: '<div class="user-location-marker"></div>',
+        className: 'user-location-marker-container',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+
+      userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], {
+        icon: userIcon,
+        zIndexOffset: 1000
+      }).addTo(mapRef.current);
+
+      userMarkerRef.current.bindPopup('<h4>Your Current Location</h4><p class="popup-details">Nearest departure hubs highlighted below.</p>');
+
+      // 2. Draw connector line to the nearest hub if available
+      if (nearestHubs && nearestHubs.length > 0) {
+        const closestHub = nearestHubs[0];
+        const pathPoints = [
+          [userLocation.lat, userLocation.lng],
+          [closestHub.lat, closestHub.lng]
+        ];
+
+        nearestHubConnectorRef.current = L.polyline(pathPoints, {
+          color: 'var(--color-primary, #cda052)',
+          weight: 3,
+          dashArray: '6, 9',
+          opacity: 0.85,
+          className: 'nearest-hub-connector'
+        }).addTo(mapRef.current);
+
+        // Zoom map to cover both user location and nearest hub
+        const bounds = L.latLngBounds([
+          [userLocation.lat, userLocation.lng],
+          [closestHub.lat, closestHub.lng]
+        ]);
+        mapRef.current.fitBounds(bounds, { padding: [80, 80], maxZoom: 10 });
+      }
+    }
+
+    // 3. Highlight/Unhighlight Static City Markers
+    staticMarkersRef.current.cities.forEach(({ name, marker }) => {
+      const match = nearestHubs?.find(nh => nh.name === name);
+      const el = marker.getElement();
+      
+      if (match) {
+        const isClosest = match.name === nearestHubs[0]?.name;
+        
+        // Add classes for glow effects
+        if (el) {
+          el.classList.add('marker-nearest-hub');
+          if (isClosest) {
+            el.classList.add('marker-nearest-hub-primary');
+          } else {
+            el.classList.remove('marker-nearest-hub-primary');
+          }
+        } else {
+          // Fallback if element not yet drawn in DOM
+          setTimeout(() => {
+            const freshEl = marker.getElement();
+            if (freshEl) {
+              freshEl.classList.add('marker-nearest-hub');
+              if (isClosest) freshEl.classList.add('marker-nearest-hub-primary');
+            }
+          }, 100);
+        }
+
+        // Show distance tooltip
+        marker.bindTooltip(`<b>${name}</b><br/>${match.distance.toFixed(0)} km away`, {
+          permanent: true,
+          direction: 'top',
+          offset: [0, -12],
+          className: `nearest-hub-tooltip ${isClosest ? 'tooltip-primary' : ''}`
+        });
+      } else {
+        // Remove classes and tooltips if not in nearestHubs list
+        if (el) {
+          el.classList.remove('marker-nearest-hub');
+          el.classList.remove('marker-nearest-hub-primary');
+        }
+        marker.unbindTooltip();
+      }
+    });
+
+  }, [userLocation, nearestHubs]);
+
   // 4. Handle Center flying details
   useEffect(() => {
     if (!mapRef.current || !selectedCenter) return;
@@ -393,8 +530,9 @@ export default function MapViewport({
     }
 
     // Update cities visibility
-    staticMarkersRef.current.cities.forEach(({ name, marker }) => {
-      const shouldBeVisible = (name === sourceCity) || (showIndianHubs && !isRouteActive);
+    staticMarkersRef.current.cities.forEach(({ name, marker, isDomestic }) => {
+      const isHubVisible = isDomestic ? showNepalHubs : showIndianHubs;
+      const shouldBeVisible = (name === sourceCity) || (isHubVisible && !isRouteActive);
       const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
 
       if (shouldBeVisible && !isCurrentlyOnMap) {
@@ -484,24 +622,56 @@ export default function MapViewport({
     });
 
     // Zoom to fit bounds
-    const bounds = L.latLngBounds([
-      [CITIES[sourceCity].lat, CITIES[sourceCity].lng],
-      [BORDERS[route.borderKey].lat, BORDERS[route.borderKey].lng],
-      [centerObj.latitude, centerObj.longitude]
-    ]);
+    const startCityObj = NEPAL_CITIES[sourceCity] || INDIAN_CITIES[sourceCity];
+    let bounds;
+    if (route.isDomestic) {
+      bounds = L.latLngBounds([
+        [startCityObj.lat, startCityObj.lng],
+        [centerObj.latitude, centerObj.longitude]
+      ]);
+    } else {
+      bounds = L.latLngBounds([
+        [startCityObj.lat, startCityObj.lng],
+        [BORDERS[route.borderKey].lat, BORDERS[route.borderKey].lng],
+        [centerObj.latitude, centerObj.longitude]
+      ]);
+    }
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
 
     // Pulse the border crossing
-    const borderMatch = staticMarkersRef.current.borders.find(b => b.name === BORDERS[route.borderKey].name);
-    if (borderMatch) {
-      addPulseClass(borderMatch.marker);
+    if (route.borderKey) {
+      const borderMatch = staticMarkersRef.current.borders.find(b => b.name === BORDERS[route.borderKey].name);
+      if (borderMatch) {
+        addPulseClass(borderMatch.marker);
+      }
     }
 
-  }, [sourceCity, targetCenter, allCenters, centers, showIndianHubs, showBorders]);
+  }, [sourceCity, targetCenter, allCenters, centers, showIndianHubs, showNepalHubs, showBorders]);
 
   return (
     <section className={`map-container ${zoomLevel >= 11 ? 'high-zoom' : ''}`} id="map-section">
       <div id="map" ref={mapContainerRef}></div>
+
+      {/* Floating Geolocation Button on Map */}
+      <button 
+        className={`map-locate-btn glassmorphic ${isLocating ? 'locating' : ''}`}
+        onClick={detectLocation}
+        title="Detect your location and find nearest departure hub"
+        aria-label="Use current location"
+      >
+        {isLocating ? (
+          <span className="spinner-small"></span>
+        ) : (
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        )}
+      </button>
       
       {/* Legend Card Overlay */}
       <div className={`map-legend glassmorphic ${isLegendCollapsed ? 'collapsed' : ''}`}>
@@ -574,7 +744,7 @@ export default function MapViewport({
             </div>
 
             <div className={`legend-item toggleable ${!showIndianHubs ? 'inactive' : ''}`}>
-              <label className="switch" title="Toggle Indian Hubs">
+              <label className="switch" title="Toggle India Hubs">
                 <input 
                   type="checkbox" 
                   checked={showIndianHubs} 
@@ -590,7 +760,27 @@ export default function MapViewport({
                   <path d="M19 21V11l-5-3v13"/>
                 </svg>
               </div>
-              <span>Indian Hubs</span>
+              <span>India Hubs</span>
+            </div>
+
+            <div className={`legend-item toggleable ${!showNepalHubs ? 'inactive' : ''}`}>
+              <label className="switch" title="Toggle Nepal Hubs">
+                <input 
+                  type="checkbox" 
+                  checked={showNepalHubs} 
+                  onChange={(e) => setShowNepalHubs(e.target.checked)} 
+                  tabIndex={isLegendCollapsed ? -1 : 0}
+                />
+                <span className="slider round"></span>
+              </label>
+              <div className="legend-marker marker-city">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 21h18"/>
+                  <path d="M5 21V7l5-4v14"/>
+                  <path d="M19 21V11l-5-3v13"/>
+                </svg>
+              </div>
+              <span>Nepal Hubs</span>
             </div>
           </div>
         </div>

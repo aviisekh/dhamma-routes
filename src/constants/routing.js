@@ -1,4 +1,4 @@
-export const CITIES = {
+export const INDIAN_CITIES = {
     "Delhi": { name: "Delhi", lat: 28.6139, lng: 77.2090, label: "Delhi (Capital Hub)" },
     "Gorakhpur": { name: "Gorakhpur", lat: 26.7606, lng: 83.3731, label: "Gorakhpur (UP)" },
     "Varanasi": { name: "Varanasi", lat: 25.3176, lng: 82.9739, label: "Varanasi (UP)" },
@@ -11,6 +11,19 @@ export const CITIES = {
     "Bengaluru": { name: "Bengaluru", lat: 12.9716, lng: 77.5946, label: "Bengaluru (KA)" },
     "Chennai": { name: "Chennai", lat: 13.0827, lng: 80.2707, label: "Chennai (TN)" },
     "Hyderabad": { name: "Hyderabad", lat: 17.3850, lng: 78.4867, label: "Hyderabad (TG)" }
+};
+
+export const NEPAL_CITIES = {
+    "Kathmandu": { name: "Kathmandu", lat: 27.7172, lng: 85.3240, label: "Kathmandu (Capital Hub)" },
+    "Pokhara": { name: "Pokhara", lat: 28.2096, lng: 83.9856, label: "Pokhara (Gandaki)" },
+    "Biratnagar": { name: "Biratnagar", lat: 26.4525, lng: 87.2718, label: "Biratnagar (Koshi)" },
+    "Nepalgunj": { name: "Nepalgunj", lat: 28.0500, lng: 81.6167, label: "Nepalgunj (Lumbini/Karnali)" },
+    "Janakpur": { name: "Janakpur", lat: 26.7271, lng: 85.9231, label: "Janakpur (Madhesh)" },
+    "Bhairahawa": { name: "Bhairahawa", lat: 27.5019, lng: 83.4478, label: "Bhairahawa (Lumbini)" },
+    "Dhangadhi": { name: "Dhangadhi", lat: 28.6853, lng: 80.6215, label: "Dhangadhi (Sudurpaschim)" },
+    "Birgunj": { name: "Birgunj", lat: 27.0125, lng: 84.8789, label: "Birgunj (Madhesh)" },
+    "Bharatpur": { name: "Bharatpur", lat: 27.6833, lng: 84.4333, label: "Bharatpur / Chitwan (Bagmati)" },
+    "Butwal": { name: "Butwal", lat: 27.6866, lng: 83.4533, label: "Butwal (Lumbini)" }
 };
 
 export const BORDERS = {

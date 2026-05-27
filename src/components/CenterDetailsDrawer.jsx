@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CITIES } from '../constants/routing';
+import { INDIAN_CITIES } from '../constants/routing';
 
 export default function CenterDetailsDrawer({ 
   center, 
@@ -317,7 +317,7 @@ export default function CenterDetailsDrawer({
                   }}
                 >
                   <option value="">Choose Starting City...</option>
-                  {Object.values(CITIES).map(city => (
+                  {Object.values(INDIAN_CITIES).map(city => (
                     <option key={city.name} value={city.name}>{city.label}</option>
                   ))}
                 </select>

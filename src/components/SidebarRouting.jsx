@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CITIES } from '../constants/routing';
+import { INDIAN_CITIES, NEPAL_CITIES } from '../constants/routing';
 import { calculateFullRoute } from '../utils/routing';
 
 
@@ -12,11 +12,27 @@ export default function SidebarRouting({
   setTargetCenter,
   onSelectCenter,
   isOpen,
-  onClose
+  onClose,
+  userLocation,
+  nearestHubs,
+  isLocating,
+  locationError,
+  detectLocation
 }) {
   const [activeTab, setActiveTab] = useState('routing');
   const [routeInfo, setRouteInfo] = useState(null);
   const [mobileState, setMobileState] = useState('peek'); // 'peek' or 'expanded'
+  const [depType, setDepType] = useState('nepal'); // 'nepal' or 'india'
+
+  useEffect(() => {
+    if (sourceCity) {
+      if (NEPAL_CITIES[sourceCity]) {
+        setDepType('nepal');
+      } else if (INDIAN_CITIES[sourceCity]) {
+        setDepType('india');
+      }
+    }
+  }, [sourceCity]);
 
   useEffect(() => {
     if (isOpen) {
@@ -154,21 +170,136 @@ export default function SidebarRouting({
             <div className="tab-panel active" role="tabpanel">
               <div className="planner-card">
                 <h3>Find Your Route</h3>
-                <p className="planner-desc">Select an Indian departure hub and a Vipassana center in Nepal to generate transit directions.</p>
+                <p className="planner-desc">Select a departure point and a Vipassana center in Nepal to generate transit directions.</p>
                 
-                <div className="form-group">
-                  <label htmlFor="select-source">Depart from India:</label>
-                  <select 
-                    id="select-source" 
-                    className="planner-select"
-                    value={sourceCity}
-                    onChange={handleSourceChange}
+                <div className="departure-type-toggle" style={{ display: 'flex', gap: '8px', marginBottom: '16px', background: 'rgba(0,0,0,0.05)', padding: '4px', borderRadius: '8px' }}>
+                  <button 
+                    type="button"
+                    className={`dep-type-tab ${depType === 'nepal' ? 'active' : ''}`}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: depType === 'nepal' ? 'var(--primary-color, #0275d8)' : 'transparent',
+                      color: depType === 'nepal' ? '#fff' : 'var(--text-color, #333)',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                    onClick={() => {
+                      setDepType('nepal');
+                      setSourceCity('');
+                      setTargetCenter('');
+                    }}
                   >
-                    <option value="">-- Choose Starting City --</option>
-                    {Object.values(CITIES).map(city => (
-                      <option key={city.name} value={city.name}>{city.label}</option>
-                    ))}
-                  </select>
+                    <span>🇳🇵</span> Nepal Domestic
+                  </button>
+                  <button 
+                    type="button"
+                    className={`dep-type-tab ${depType === 'india' ? 'active' : ''}`}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: depType === 'india' ? 'var(--primary-color, #0275d8)' : 'transparent',
+                      color: depType === 'india' ? '#fff' : 'var(--text-color, #333)',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                    onClick={() => {
+                      setDepType('india');
+                      setSourceCity('');
+                      setTargetCenter('');
+                    }}
+                  >
+                    <span>🇮🇳</span> India Hubs
+                  </button>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="select-source">
+                    {depType === 'nepal' ? 'Depart from Nepal:' : 'Depart from India:'}
+                  </label>
+                  <div className="select-with-locate">
+                    <select 
+                      id="select-source" 
+                      className="planner-select"
+                      value={sourceCity}
+                      onChange={handleSourceChange}
+                    >
+                      <option value="">-- Choose Starting City --</option>
+                      {depType === 'nepal' ? (
+                        Object.values(NEPAL_CITIES).map(city => (
+                          <option key={city.name} value={city.name}>{city.label}</option>
+                        ))
+                      ) : (
+                        Object.values(INDIAN_CITIES).map(city => (
+                          <option key={city.name} value={city.name}>{city.label}</option>
+                        ))
+                      )}
+                    </select>
+
+                    <button
+                      type="button"
+                      className={`location-detect-btn ${isLocating ? 'loading' : ''}`}
+                      onClick={detectLocation}
+                      disabled={isLocating}
+                      title="Detect your location and find nearest departure hub"
+                      aria-label="Use current location"
+                    >
+                      {isLocating ? (
+                        <span className="spinner-small"></span>
+                      ) : (
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <circle cx="12" cy="12" r="3"></circle>
+                          <line x1="12" y1="1" x2="12" y2="3"></line>
+                          <line x1="12" y1="21" x2="12" y2="23"></line>
+                          <line x1="1" y1="12" x2="3" y2="12"></line>
+                          <line x1="21" y1="12" x2="23" y2="12"></line>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+
+                  {locationError && (
+                    <div className="location-error-msg">
+                      ⚠️ {locationError}
+                    </div>
+                  )}
+
+                  {userLocation && nearestHubs && nearestHubs.length > 0 && (
+                    <div className="nearest-hubs-container">
+                      <div className="nearest-hubs-title">Nearest Hubs Detected:</div>
+                      <div className="nearest-hubs-chips">
+                        {nearestHubs.map((hub) => (
+                          <button
+                            key={hub.name}
+                            type="button"
+                            className={`hub-chip ${sourceCity === hub.name ? 'active' : ''}`}
+                            onClick={() => setSourceCity(hub.name)}
+                            title={`Select ${hub.name} (${hub.distance.toFixed(1)} km away)`}
+                          >
+                            <span className="hub-chip-name">{hub.name}</span>
+                            <span className="hub-chip-dist">{hub.distance.toFixed(0)} km</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -225,12 +356,18 @@ export default function SidebarRouting({
                         <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 4L9 7"></path>
                       </svg>
                     </div>
-                    <p>Select your starting city and destination center to view transit routes and border crossings.</p>
+                    <p>Select your starting city and destination center to view transit routes.</p>
                   </div>
                 ) : (
                   <div className="route-details-panel">
                     <div className="route-header">
-                      <h4>{sourceCity} &rarr; {routeInfo.borderName.replace(' Border', '')} &rarr; {targetCenter.replace(' Vipassana Center', '')}</h4>
+                      <h4>
+                        {routeInfo.isDomestic ? (
+                          <>{sourceCity} &rarr; {targetCenter.replace(' Vipassana Center', '')}</>
+                        ) : (
+                          <>{sourceCity} &rarr; {routeInfo.borderName.replace(' Border', '')} &rarr; {targetCenter.replace(' Vipassana Center', '')}</>
+                        )}
+                      </h4>
                       <div className="route-modes">
                         {Array.from(new Set(routeInfo.segments.map(s => s.mode))).map(m => (
                           <span key={m} className={`mode-badge badge-${m}`}>
@@ -241,40 +378,63 @@ export default function SidebarRouting({
                     </div>
                     
                     <div className="timeline">
-                      <div className="timeline-item origin">
-                        <div className="timeline-icon">📍</div>
-                        <div className="timeline-content">
-                          <h5>DEPART: {sourceCity} (India)</h5>
-                          <p className="timeline-desc">Starting point for your journey.</p>
-                        </div>
-                      </div>
-                      
-                      <div className="timeline-item">
-                        <div className="timeline-icon">{routeInfo.segments[0].mode === 'rail' ? '🚆' : '🚌'}</div>
-                        <div className="timeline-content">
-                          <h5>{routeInfo.segments[0].label}</h5>
-                          <div className="timeline-meta">India Segment</div>
-                          <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[0].desc }}></p>
-                        </div>
-                      </div>
+                      {routeInfo.isDomestic ? (
+                        <>
+                          <div className="timeline-item origin">
+                            <div className="timeline-icon">📍</div>
+                            <div className="timeline-content">
+                              <h5>DEPART: {sourceCity} (Nepal)</h5>
+                              <p className="timeline-desc">Starting point for your journey.</p>
+                            </div>
+                          </div>
+                          
+                          <div className="timeline-item">
+                            <div className="timeline-icon">{routeInfo.segments[0].mode === 'air' ? '✈️' : '🚌'}</div>
+                            <div className="timeline-content">
+                              <h5>{routeInfo.segments[0].label}</h5>
+                              <div className="timeline-meta">Domestic Route</div>
+                              <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[0].desc }}></p>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="timeline-item origin">
+                            <div className="timeline-icon">📍</div>
+                            <div className="timeline-content">
+                              <h5>DEPART: {sourceCity} (India)</h5>
+                              <p className="timeline-desc">Starting point for your journey.</p>
+                            </div>
+                          </div>
+                          
+                          <div className="timeline-item">
+                            <div className="timeline-icon">{routeInfo.segments[0].mode === 'rail' ? '🚆' : '🚌'}</div>
+                            <div className="timeline-content">
+                              <h5>{routeInfo.segments[0].label}</h5>
+                              <div className="timeline-meta">India Segment</div>
+                              <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[0].desc }}></p>
+                            </div>
+                          </div>
 
-                      <div className="timeline-item">
-                        <div className="timeline-icon">🛂</div>
-                        <div className="timeline-content">
-                          <h5>{routeInfo.segments[1].label}</h5>
-                          <div className="timeline-meta">{routeInfo.borderName} Crossing</div>
-                          <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[1].desc }}></p>
-                        </div>
-                      </div>
+                          <div className="timeline-item">
+                            <div className="timeline-icon">🛂</div>
+                            <div className="timeline-content">
+                              <h5>{routeInfo.segments[1].label}</h5>
+                              <div className="timeline-meta">{routeInfo.borderName} Crossing</div>
+                              <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[1].desc }}></p>
+                            </div>
+                          </div>
 
-                      <div className="timeline-item">
-                        <div className="timeline-icon">{routeInfo.segments[2].mode === 'air' ? '✈️' : routeInfo.segments[2].mode === 'rail' ? '🚆' : '🚌'}</div>
-                        <div className="timeline-content">
-                          <h5>{routeInfo.segments[2].label}</h5>
-                          <div className="timeline-meta">Nepal Segment</div>
-                          <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[2].desc }}></p>
-                        </div>
-                      </div>
+                          <div className="timeline-item">
+                            <div className="timeline-icon">{routeInfo.segments[2].mode === 'air' ? '✈️' : routeInfo.segments[2].mode === 'rail' ? '🚆' : '🚌'}</div>
+                            <div className="timeline-content">
+                              <h5>{routeInfo.segments[2].label}</h5>
+                              <div className="timeline-meta">Nepal Segment</div>
+                              <p className="timeline-desc" dangerouslySetInnerHTML={{ __html: routeInfo.segments[2].desc }}></p>
+                            </div>
+                          </div>
+                        </>
+                      )}
 
                       <div className="timeline-item destination">
                         <div className="timeline-icon">☸️</div>
