@@ -80,7 +80,9 @@ function createTransitBadgeIcon(mode) {
     bgColor = '#222222'; // Dark grey for rail
     svgIcon = `
       <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
-        <path d="M12 2c-4 0-7 2-7 6v6.5C5 17.5 7 19 9.5 20l.5.5v1.5c0 .3.2.5.5.5h3c.3 0 .5-.2.5-.5v-1.5l.5-.5c2.5-1 4.5-2.5 4.5-4V9.5c0-4-3-6-7-6zm-3.5 11c-.8 0-1.5-.7-1.5-1.5S7.7 9 8.5 9s1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/>
+        <path d="M2 17h20v1.5H2zm2-9h16a1.5 1.5 0 0 1 1.5 1.5v3c0 .83-.67 1.5-1.5 1.5H4A1.5 1.5 0 0 1 2.5 11.5v-2A1.5 1.5 0 0 1 4 8zm1 1.5h2v2H5zm4 0h2v2H9zm4 0h2v2h-2z"/>
+        <circle cx="6" cy="15.5" r="1.5"/>
+        <circle cx="18" cy="15.5" r="1.5"/>
       </svg>
     `;
   } else if (mode === 'air') {
@@ -147,6 +149,11 @@ export default function MapViewport({
 
   // Legend Collapse State
   const [isLegendCollapsed, setIsLegendCollapsed] = useState(false);
+
+  // Visibility States for Map Layers
+  const [showCenters, setShowCenters] = useState(true);
+  const [showBorders, setShowBorders] = useState(true);
+  const [showIndianHubs, setShowIndianHubs] = useState(true);
 
   // Invalidate Map layout size after sidebar transition completes
   useEffect(() => {
@@ -224,7 +231,7 @@ export default function MapViewport({
     }).addTo(mapRef.current);
   }, [theme]);
 
-  // 3. Sync Dynamic Centers (plot whenever filters change or route changes)
+  // 3. Sync Dynamic Centers (plot whenever filters, route selection, or visibility changes)
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -237,9 +244,26 @@ export default function MapViewport({
       ? (allCenters || centers).find(c => c.center_name === targetCenter)
       : null;
 
-    const centersToShow = isRouteActive && targetCenterObj
-      ? [targetCenterObj]
-      : centers;
+    // Determine which centers to show
+    let centersToShow = [];
+    if (isRouteActive && targetCenterObj) {
+      const activeCenters = new Set();
+      if (targetCenterObj) activeCenters.add(targetCenterObj);
+      
+      // If there is a selected center, always show it so the user can inspect it
+      if (selectedCenter) {
+        const selCenterObj = (allCenters || centers).find(c => c.center_name === selectedCenter.center_name);
+        if (selCenterObj) activeCenters.add(selCenterObj);
+      }
+      centersToShow = Array.from(activeCenters);
+    } else {
+      if (showCenters) {
+        centersToShow = centers;
+      } else if (selectedCenter) {
+        const selCenterObj = (allCenters || centers).find(c => c.center_name === selectedCenter.center_name);
+        centersToShow = selCenterObj ? [selCenterObj] : [];
+      }
+    }
 
     // Plot active ones
     const newMarkers = centersToShow.map(center => {
@@ -261,7 +285,7 @@ export default function MapViewport({
     });
 
     centerMarkersRef.current = newMarkers;
-  }, [centers, allCenters, onSelectCenter, sourceCity, targetCenter]);
+  }, [centers, allCenters, onSelectCenter, sourceCity, targetCenter, selectedCenter, showCenters]);
 
   // 4. Handle Center flying details
   useEffect(() => {
@@ -333,7 +357,7 @@ export default function MapViewport({
 
     // Update cities visibility
     staticMarkersRef.current.cities.forEach(({ name, marker }) => {
-      const shouldBeVisible = !isRouteActive || name === sourceCity;
+      const shouldBeVisible = (name === sourceCity) || (showIndianHubs && !isRouteActive);
       const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
 
       if (shouldBeVisible && !isCurrentlyOnMap) {
@@ -346,7 +370,7 @@ export default function MapViewport({
     // Update borders visibility
     staticMarkersRef.current.borders.forEach(({ name, marker }) => {
       const activeBorderName = activeBorderKey ? BORDERS[activeBorderKey]?.name : null;
-      const shouldBeVisible = !isRouteActive || name === activeBorderName;
+      const shouldBeVisible = (name === activeBorderName) || (showBorders && !isRouteActive);
       const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
 
       if (shouldBeVisible && !isCurrentlyOnMap) {
@@ -436,7 +460,7 @@ export default function MapViewport({
       addPulseClass(borderMatch.marker);
     }
 
-  }, [sourceCity, targetCenter, allCenters, centers]);
+  }, [sourceCity, targetCenter, allCenters, centers, showIndianHubs, showBorders]);
 
   return (
     <section className="map-container" id="map-section">
@@ -460,6 +484,7 @@ export default function MapViewport({
         
         <div className="legend-content">
           <div className="legend-items">
+            <div className="legend-group-title">Transit Modes</div>
             <div className="legend-item">
               <span className="legend-line line-road"></span>
               <span>Roadways</span>
@@ -472,16 +497,62 @@ export default function MapViewport({
               <span className="legend-line line-air"></span>
               <span>Airways</span>
             </div>
-            <div className="legend-item">
-              <span className="legend-dot dot-center"></span>
+
+            <div className="legend-group-title">Map Features</div>
+            <div className={`legend-item toggleable ${!showCenters ? 'inactive' : ''}`}>
+              <label className="switch" title="Toggle Vipassana Centers">
+                <input 
+                  type="checkbox" 
+                  checked={showCenters} 
+                  onChange={(e) => setShowCenters(e.target.checked)} 
+                  tabIndex={isLegendCollapsed ? -1 : 0}
+                />
+                <span className="slider round"></span>
+              </label>
+              <div className="legend-marker marker-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="5" r="2.5"/>
+                  <path d="M9 10c0-1.5 1.5-2 3-2s3 .5 3 2v4c0 1.5-1.5 2-3 2s-3-.5-3-2v-4z"/>
+                  <path d="M5 19c0-2.5 3-3.5 7-3.5s7 1 7 3.5"/>
+                  <path d="M3 21h18"/>
+                </svg>
+              </div>
               <span>Vipassana Centers</span>
             </div>
-            <div className="legend-item">
-              <span className="legend-dot dot-border"></span>
+
+            <div className={`legend-item toggleable ${!showBorders ? 'inactive' : ''}`}>
+              <label className="switch" title="Toggle Border Crossings">
+                <input 
+                  type="checkbox" 
+                  checked={showBorders} 
+                  onChange={(e) => setShowBorders(e.target.checked)} 
+                  tabIndex={isLegendCollapsed ? -1 : 0}
+                />
+                <span className="slider round"></span>
+              </label>
+              <div className="legend-marker marker-border">
+                <div className="marker-border-inner"></div>
+              </div>
               <span>Border Crossings</span>
             </div>
-            <div className="legend-item">
-              <span className="legend-dot dot-city"></span>
+
+            <div className={`legend-item toggleable ${!showIndianHubs ? 'inactive' : ''}`}>
+              <label className="switch" title="Toggle Indian Hubs">
+                <input 
+                  type="checkbox" 
+                  checked={showIndianHubs} 
+                  onChange={(e) => setShowIndianHubs(e.target.checked)} 
+                  tabIndex={isLegendCollapsed ? -1 : 0}
+                />
+                <span className="slider round"></span>
+              </label>
+              <div className="legend-marker marker-city">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 21h18"/>
+                  <path d="M5 21V7l5-4v14"/>
+                  <path d="M19 21V11l-5-3v13"/>
+                </svg>
+              </div>
               <span>Indian Hubs</span>
             </div>
           </div>

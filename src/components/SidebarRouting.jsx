@@ -191,7 +191,7 @@ export default function SidebarRouting({
                       <div className="route-modes">
                         {Array.from(new Set(routeInfo.segments.map(s => s.mode))).map(m => (
                           <span key={m} className={`mode-badge badge-${m}`}>
-                            {m === 'rail' ? '🚂 Rail' : m === 'air' ? '✈️ Air' : '🚌 Road'}
+                            {m === 'rail' ? '🚆 Rail' : m === 'air' ? '✈️ Air' : '🚌 Road'}
                           </span>
                         ))}
                       </div>
@@ -207,7 +207,7 @@ export default function SidebarRouting({
                       </div>
                       
                       <div className="timeline-item">
-                        <div className="timeline-icon">{routeInfo.segments[0].mode === 'rail' ? '🚂' : '🚌'}</div>
+                        <div className="timeline-icon">{routeInfo.segments[0].mode === 'rail' ? '🚆' : '🚌'}</div>
                         <div className="timeline-content">
                           <h5>{routeInfo.segments[0].label}</h5>
                           <div className="timeline-meta">India Segment</div>
@@ -225,7 +225,7 @@ export default function SidebarRouting({
                       </div>
 
                       <div className="timeline-item">
-                        <div className="timeline-icon">{routeInfo.segments[2].mode === 'air' ? '✈️' : routeInfo.segments[2].mode === 'rail' ? '🚂' : '🚌'}</div>
+                        <div className="timeline-icon">{routeInfo.segments[2].mode === 'air' ? '✈️' : routeInfo.segments[2].mode === 'rail' ? '🚆' : '🚌'}</div>
                         <div className="timeline-content">
                           <h5>{routeInfo.segments[2].label}</h5>
                           <div className="timeline-meta">Nepal Segment</div>
