@@ -174,32 +174,36 @@ export default function App() {
           onToggleCollapse={() => setIsRightCollapsed(!isRightCollapsed)}
         />
 
-        {/* Floating Expand Buttons (visible on desktop when sidebars are collapsed) */}
-        {isLeftCollapsed && (
-          <button 
-            className="floating-expand-btn expand-left"
-            onClick={() => setIsLeftCollapsed(false)}
-            title="Expand Centers List"
-            aria-label="Expand Centers List"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+        {/* Unified Border Toggle Buttons */}
+        <button 
+          className={`sidebar-border-toggle toggle-left ${isLeftCollapsed ? 'collapsed' : ''}`}
+          onClick={() => setIsLeftCollapsed(!isLeftCollapsed)}
+          title={isLeftCollapsed ? "Expand Centers List" : "Collapse Centers List"}
+          aria-label={isLeftCollapsed ? "Expand Centers List" : "Collapse Centers List"}
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
+            {isLeftCollapsed ? (
               <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-        )}
-
-        {isRightCollapsed && (
-          <button 
-            className="floating-expand-btn expand-right"
-            onClick={() => setIsRightCollapsed(false)}
-            title="Expand Route Planner"
-            aria-label="Expand Route Planner"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+            ) : (
               <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-        )}
+            )}
+          </svg>
+        </button>
+
+        <button 
+          className={`sidebar-border-toggle toggle-right ${isRightCollapsed ? 'collapsed' : ''}`}
+          onClick={() => setIsRightCollapsed(!isRightCollapsed)}
+          title={isRightCollapsed ? "Expand Route Planner" : "Collapse Route Planner"}
+          aria-label={isRightCollapsed ? "Expand Route Planner" : "Collapse Route Planner"}
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
+            {isRightCollapsed ? (
+              <polyline points="15 18 9 12 15 6"></polyline>
+            ) : (
+              <polyline points="9 18 15 12 9 6"></polyline>
+            )}
+          </svg>
+        </button>
 
 
         {/* Floating Mobile Action Buttons */}

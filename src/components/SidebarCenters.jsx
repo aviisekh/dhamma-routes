@@ -16,6 +16,14 @@ export default function SidebarCenters({
   isCollapsed,
   onToggleCollapse
 }) {
+  const [mobileState, setMobileState] = React.useState('peek'); // 'peek' or 'expanded'
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setMobileState('peek');
+    }
+  }, [isOpen]);
+
   const handleCollapseClick = () => {
     if (window.innerWidth <= 992) {
       if (onClose) onClose();
@@ -37,21 +45,32 @@ export default function SidebarCenters({
     const diffX = touchStartRef.current.x - touch.clientX;
     const diffY = touchStartRef.current.y - touch.clientY;
 
-    // Swipe left: touch starts at right and moves left, so diffX > 0
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-      if (diffX > 0) {
-        if (onClose) onClose();
+    // Check if vertical swipe is dominant
+    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+      if (diffY > 0) {
+        // Swipe UP (diffY is positive, meaning user dragged upwards)
+        if (mobileState === 'peek') {
+          setMobileState('expanded');
+        }
+      } else {
+        // Swipe DOWN (diffY is negative, meaning user dragged downwards)
+        if (mobileState === 'expanded') {
+          setMobileState('peek');
+        } else if (mobileState === 'peek') {
+          if (onClose) onClose();
+        }
       }
     }
   };
 
   return (
     <aside 
-      className={`sidebar left-sidebar ${isOpen ? 'open' : ''}`} 
+      className={`sidebar left-sidebar ${isOpen ? 'open' : ''} ${mobileState === 'expanded' ? 'expanded' : ''}`} 
       id="sidebar-centers"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <div className="bottom-sheet-handle"></div>
       <div className="sidebar-header">
         <h2>Vipassana Centers</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

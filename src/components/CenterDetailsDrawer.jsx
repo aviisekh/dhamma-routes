@@ -12,7 +12,13 @@ export default function CenterDetailsDrawer({
 }) {
   const drawerRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [mobileState, setMobileState] = useState('peek'); // 'peek' or 'expanded'
 
+  useEffect(() => {
+    if (center) {
+      setMobileState('peek');
+    }
+  }, [center]);
 
   // Focus the drawer for accessibility and handle ESC key to close
   useEffect(() => {
@@ -37,6 +43,36 @@ export default function CenterDetailsDrawer({
     };
   }, [center, onClose]);
 
+  const touchStartRef = useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
+    const diffX = touchStartRef.current.x - touch.clientX;
+    const diffY = touchStartRef.current.y - touch.clientY;
+
+    // Check if vertical swipe is dominant
+    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+      if (diffY > 0) {
+        // Swipe UP
+        if (mobileState === 'peek') {
+          setMobileState('expanded');
+        }
+      } else {
+        // Swipe DOWN
+        if (mobileState === 'expanded') {
+          setMobileState('peek');
+        } else if (mobileState === 'peek') {
+          onClose();
+        }
+      }
+    }
+  };
 
   const hasPagoda = center && center.pagoda && center.pagoda.toLowerCase().includes('yes');
   const isUnderConstruction = center && center.remarks && center.remarks.toLowerCase().includes('under construction');
@@ -98,7 +134,12 @@ export default function CenterDetailsDrawer({
     >
       <div className="drawer-backdrop" onClick={onClose}></div>
       {center && (
-        <div className="drawer-content glassmorphic">
+        <div 
+          className={`drawer-content glassmorphic ${mobileState === 'expanded' ? 'expanded' : ''}`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="bottom-sheet-handle"></div>
           <button className="close-btn" onClick={onClose} aria-label="Close details">&times;</button>
           <div className="drawer-body">
             <div className="drawer-center-header">
