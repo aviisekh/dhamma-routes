@@ -204,6 +204,23 @@ export default function App() {
 
         {/* Floating Mobile Action Buttons */}
         <div className="mobile-controls">
+          {(sourceCity || targetCenter) && (
+            <button 
+              className="mobile-btn mobile-clear-btn"
+              onClick={() => {
+                setSourceCity('');
+                setTargetCenter('');
+                setSelectedCenter(null);
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Clear Route
+            </button>
+          )}
+
           <button 
             className="mobile-btn"
             onClick={() => {

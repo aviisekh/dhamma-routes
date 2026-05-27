@@ -24,8 +24,34 @@ export default function SidebarCenters({
     }
   };
 
+  const touchStartRef = React.useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    const touch = e.changedTouches[0];
+    const diffX = touchStartRef.current.x - touch.clientX;
+    const diffY = touchStartRef.current.y - touch.clientY;
+
+    // Swipe left: touch starts at right and moves left, so diffX > 0
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        if (onClose) onClose();
+      }
+    }
+  };
+
   return (
-    <aside className={`sidebar left-sidebar ${isOpen ? 'open' : ''}`} id="sidebar-centers">
+    <aside 
+      className={`sidebar left-sidebar ${isOpen ? 'open' : ''}`} 
+      id="sidebar-centers"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="sidebar-header">
         <h2>Vipassana Centers</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
