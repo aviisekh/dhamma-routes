@@ -4,8 +4,26 @@ import SidebarCenters from './components/SidebarCenters';
 import MapViewport from './components/MapViewport';
 import SidebarRouting from './components/SidebarRouting';
 import CenterDetailsDrawer from './components/CenterDetailsDrawer';
-import { parseCSV } from './utils/csv';
-import { COORDINATES_OVERRIDES } from './utils/routing';
+import { VIPASSANA_CENTERS } from './constants/centers';
+import { COORDINATES_OVERRIDES } from './constants/routing';
+
+// Clean coordinates and apply geocoding overrides
+const INITIAL_CENTERS = VIPASSANA_CENTERS.map(c => {
+  const name = c.center_name;
+  let lat = parseFloat(c.latitude);
+  let lng = parseFloat(c.longitude);
+
+  if (COORDINATES_OVERRIDES[name]) {
+    lat = COORDINATES_OVERRIDES[name].lat;
+    lng = COORDINATES_OVERRIDES[name].lng;
+  }
+
+  return {
+    ...c,
+    latitude: lat || 27.7,
+    longitude: lng || 85.3
+  };
+});
 
 export default function App() {
   // 1. Theme State
@@ -16,8 +34,8 @@ export default function App() {
   });
 
   // 2. Data & Loading States
-  const [centers, setCenters] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [centers, setCenters] = useState(INITIAL_CENTERS);
+  const [loading, setLoading] = useState(false);
 
   // 3. User selections
   const [selectedCenter, setSelectedCenter] = useState(null);
@@ -57,44 +75,6 @@ export default function App() {
     return () => media.removeEventListener('change', listener);
   }, []);
 
-  // Fetch and parse CSV centers on mount
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const response = await fetch('/vipassana_centers_final.csv');
-        if (!response.ok) throw new Error("Failed to load CSV file.");
-        
-        const csvText = await response.text();
-        const parsed = parseCSV(csvText);
-        
-        // Clean coordinates and apply geocoding overrides
-        const formatted = parsed.map(c => {
-          const name = c.center_name;
-          let lat = parseFloat(c.latitude);
-          let lng = parseFloat(c.longitude);
-
-          if (COORDINATES_OVERRIDES[name]) {
-            lat = COORDINATES_OVERRIDES[name].lat;
-            lng = COORDINATES_OVERRIDES[name].lng;
-          }
-
-          return {
-            ...c,
-            latitude: lat || 27.7,
-            longitude: lng || 85.3
-          };
-        });
-
-        setCenters(formatted);
-      } catch (err) {
-        console.error("Error reading CSV:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
 
   const handleThemeToggle = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { CITIES, BORDERS, calculateFullRoute } from '../utils/routing';
+import { CITIES, BORDERS } from '../constants/routing';
+import { calculateFullRoute } from '../utils/routing';
 
 // Helper to build custom HTML markers
 function createMarkerIcon(type, size = 30) {

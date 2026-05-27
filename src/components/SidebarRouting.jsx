@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { CITIES, calculateFullRoute } from '../utils/routing';
+import { CITIES } from '../constants/routing';
+import { calculateFullRoute } from '../utils/routing';
+
 
 export default function SidebarRouting({
   centers,
