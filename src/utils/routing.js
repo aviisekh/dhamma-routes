@@ -6,7 +6,11 @@ export const CITIES = {
     "Patna": { name: "Patna", lat: 25.5941, lng: 85.1376, label: "Patna (Bihar)" },
     "Darbhanga": { name: "Darbhanga", lat: 26.1542, lng: 85.8918, label: "Darbhanga (Bihar)" },
     "Kolkata": { name: "Kolkata", lat: 22.5726, lng: 88.3639, label: "Kolkata (WB)" },
-    "Siliguri": { name: "Siliguri", lat: 26.7145, lng: 88.4385, label: "Siliguri / NJP (WB)" }
+    "Siliguri": { name: "Siliguri", lat: 26.7145, lng: 88.4385, label: "Siliguri / NJP (WB)" },
+    "Mumbai": { name: "Mumbai", lat: 19.0760, lng: 72.8777, label: "Mumbai (MH)" },
+    "Bengaluru": { name: "Bengaluru", lat: 12.9716, lng: 77.5946, label: "Bengaluru (KA)" },
+    "Chennai": { name: "Chennai", lat: 13.0827, lng: 80.2707, label: "Chennai (TN)" },
+    "Hyderabad": { name: "Hyderabad", lat: 17.3850, lng: 78.4867, label: "Hyderabad (TG)" }
 };
 
 export const BORDERS = {
@@ -15,7 +19,8 @@ export const BORDERS = {
     "Sunauli": { name: "Sunauli Border", lat: 27.4385, lng: 83.4681, desc: "Sunauli (India) / Belahiya (Nepal) Crossing" },
     "Raxaul": { name: "Raxaul Border", lat: 27.0016, lng: 84.8715, desc: "Raxaul (India) / Birgunj (Nepal) Crossing" },
     "Jaynagar": { name: "Jaynagar Border", lat: 26.6083, lng: 86.1362, desc: "Jaynagar (India) / Janakpur (Nepal) Crossing" },
-    "Panitanki": { name: "Panitanki Border", lat: 26.6385, lng: 88.1612, desc: "Panitanki (India) / Kakarbhitta (Nepal) Crossing" }
+    "Panitanki": { name: "Panitanki Border", lat: 26.6385, lng: 88.1612, desc: "Panitanki (India) / Kakarbhitta (Nepal) Crossing" },
+    "KTM": { name: "Kathmandu Airport (KTM)", lat: 27.6980, lng: 85.3590, desc: "Tribhuvan International Airport (KTM) Entry Port" }
 };
 
 export const COORDINATES_OVERRIDES = {
@@ -40,6 +45,19 @@ export const COORDINATES_OVERRIDES = {
 };
 
 export function getBestBorder(source, centerName) {
+    const isDistant = ["Mumbai", "Bengaluru", "Chennai", "Hyderabad"].includes(source);
+
+    if (isDistant) {
+        if (centerName.includes("Sudur Paschim")) return "Banbasa";
+        if (centerName.includes("Surkhetta") || centerName.includes("Dang")) return "Rupaidiha";
+        if (centerName.includes("Ilam") || centerName.includes("Purbanchal")) return "Panitanki";
+        if (centerName.includes("Lumbini") || centerName.includes("Debdaha") || centerName.includes("Kapilvastu") || centerName.includes("Palpa")) {
+            return "Sunauli";
+        }
+        // Default for Kathmandu Valley, Pokhara, Chitwan, Dhamma Tarai, Lukla: Kathmandu Airport (KTM)
+        return "KTM";
+    }
+
     if (centerName.includes("Sudur Paschim")) return "Banbasa";
     
     if (centerName.includes("Surkhetta") || centerName.includes("Dang")) {
@@ -84,7 +102,45 @@ export function getIndiaToBorderSegment(source, borderKey) {
     let label = '';
     let desc = '';
     
-    if (source === 'Delhi' && borderKey === 'Sunauli') {
+    const isDistant = ["Mumbai", "Bengaluru", "Chennai", "Hyderabad"].includes(source);
+
+    if (isDistant) {
+        if (borderKey === 'KTM') {
+            mode = 'air';
+            if (source === 'Mumbai') {
+                label = 'Direct Flight: Mumbai (BOM) ✈️ Kathmandu (KTM)';
+                desc = 'Board a direct flight from Chhatrapati Shivaji Maharaj International Airport (BOM) directly to Tribhuvan International Airport (KTM) in Kathmandu (approx. 3 hours).';
+            } else if (source === 'Bengaluru') {
+                label = 'Connecting Flight: Bengaluru (BLR) ✈️ Kathmandu (KTM)';
+                desc = 'Board a flight from Kempegowda International Airport (BLR) to Kathmandu (KTM) with a layover in New Delhi (approx. 5.5 hours total time).';
+            } else if (source === 'Chennai') {
+                label = 'Connecting Flight: Chennai (MAA) ✈️ Kathmandu (KTM)';
+                desc = 'Take a flight from Chennai International Airport (MAA) to Kathmandu (KTM) via New Delhi (approx. 6 hours total time).';
+            } else {
+                label = 'Connecting Flight: Hyderabad (HYD) ✈️ Kathmandu (KTM)';
+                desc = 'Book a flight from Rajiv Gandhi International Airport (HYD) to Kathmandu (KTM) with a layout in New Delhi (approx. 5.5 hours total time).';
+            }
+        } else if (borderKey === 'Panitanki') {
+            mode = 'air';
+            label = 'Flight to Bagdogra, then Taxi to Border';
+            desc = 'Fly from your city to Bagdogra Airport (IXB) in Siliguri (3-4.5 hours with layover/direct options). From Bagdogra, hire a taxi or private vehicle to Panitanki Border (approx. 45 mins, 28 km).';
+        } else if (borderKey === 'Sunauli') {
+            mode = 'air';
+            label = 'Flight to Gorakhpur (via Delhi), then Taxi to Border';
+            desc = 'Fly from your city to Gorakhpur Airport (GKP) (typically with a layover in Delhi). From Gorakhpur Junction, board a local bus or hire a taxi to the Sunauli Border gate (approx. 2.5 hours, 80 km).';
+        } else if (borderKey === 'Rupaidiha') {
+            mode = 'air';
+            label = 'Flight to Lucknow, then Road to Border';
+            desc = 'Fly to Lucknow Airport (LKO). From Lucknow Kaiserbagh bus park, take a direct state transport bus (UPSRTC) or private cab to Rupaidiha Border checkpost (approx. 4 hours, 180 km).';
+        } else if (borderKey === 'Banbasa') {
+            mode = 'air';
+            label = 'Flight to Delhi, then Train/Bus to Border';
+            desc = 'Fly to New Delhi (DEL) (approx. 2 hours). From Delhi, catch the daily Purnagiri Jan Shatabdi Express to Banbasa Station (approx. 7.5 hours) or board an overnight state bus.';
+        } else {
+            label = `Transit to ${BORDERS[borderKey].name}`;
+            desc = `Fly or travel by train from ${source} towards the ${BORDERS[borderKey].name} crossing.`;
+        }
+    } else if (source === 'Delhi' && borderKey === 'Sunauli') {
         const pivot = [26.76, 83.37];
         path = [startCoord, pivot, endCoord];
         mode = 'rail';
@@ -160,6 +216,8 @@ export function getBorderCrossSegment(borderKey) {
         desc = 'Cross the border checkpost on foot or via local rickshaw (1 km) into Nepalgunj. Complete customs stamping.';
     } else if (borderKey === 'Banbasa') {
         desc = 'Travel across the Sharda River Barrage on a cycle rickshaw or walk (approx. 2 km) to enter Mahendranagar, Nepal. Note that heavy vehicles are only allowed during specific hours.';
+    } else if (borderKey === 'KTM') {
+        desc = 'Clear airport immigration and customs at Tribhuvan International Airport (KTM) in Kathmandu. Indian citizens require a valid passport or voter ID card; foreign nationals can obtain a visa-on-arrival (15/30/90 days).';
     } else {
         desc = 'Walk across the border gate to clear immigration and customs.';
     }
@@ -188,7 +246,32 @@ export function getNepalToCenterSegment(borderKey, center) {
                               name.includes("Kakani") || 
                               name.includes("Nakkhu");
                               
-    if (isKathmanduCenter) {
+    if (borderKey === 'KTM') {
+        if (isKathmanduCenter) {
+            mode = 'road';
+            label = 'Prepaid Taxi / App Ride (Pathao / InDrive)';
+            desc = 'Hire a prepaid airport taxi or book a ride via local apps like Pathao or InDrive from Kathmandu Airport. The center is located about 12-18 km away (approx. 45-60 mins depending on traffic).';
+        } else if (name.includes("Pokhara")) {
+            mode = 'air';
+            label = 'Option A: Domestic Flight | Option B: Tourist Bus';
+            desc = '<strong>Option A (Recommended):</strong> Walk to the KTM domestic terminal and take a 25-minute flight to Pokhara International Airport (PKR), followed by a short taxi to Begnas Lake. <br><strong>Option B (Budget):</strong> Take a local taxi to Gongabu Bus Park, and board a daily tourist bus to Pokhara (approx. 7-8 hours).';
+        } else if (name.includes("Chitwan")) {
+            mode = 'road';
+            label = 'Option A: Domestic Flight | Option B: Tourist Bus';
+            desc = '<strong>Option A (Air):</strong> Take a domestic flight from KTM to Bharatpur Airport (20 mins), then local transit. <br><strong>Option B (Road):</strong> Catch a tourist bus or shared Micro from Gongabu Bus Park to Bharatpur, Chitwan (approx. 5-6 hours).';
+        } else if (name.includes("Dhamma Tarai")) {
+            mode = 'road';
+            label = 'Option A: Flight to Simara | Option B: Tata Sumo Jeep';
+            desc = '<strong>Option A:</strong> Take a domestic flight to Simara Airport (15 mins), then taxi to the center in Birgunj. <br><strong>Option B:</strong> Take a shared Tata Sumo jeep from Balkhu, Kathmandu directly to Birgunj (approx. 4-5 hours).';
+        } else if (name.includes("Lukla")) {
+            mode = 'air';
+            label = 'Domestic Flight from KTM';
+            desc = 'Lukla is only accessible by air. Catch a scheduled STOL flight from the domestic terminal to Tenzing-Hillary Airport (LUA) in Lukla (approx. 35 mins flight). Carry heavy warm clothes.';
+        } else {
+            label = 'Domestic Flight / Tourist Bus';
+            desc = 'Take a domestic flight from KTM domestic terminal to the nearest regional airport (e.g. Biratnagar/Bhadrapur) or proceed via long-distance bus from Gongabu Bus Park.';
+        }
+    } else if (isKathmanduCenter) {
         if (borderKey === 'Sunauli') {
             mode = 'air';
             label = 'Option A: Fly from Bhairahawa | Option B: Tourist Bus';
@@ -260,6 +343,32 @@ export function getNepalToCenterSegment(borderKey, center) {
     return { path, mode, label, desc };
 }
 
+function getBezierPoints(start, end, curvature = 0.15) {
+    const [lat0, lng0] = start;
+    const [lat1, lng1] = end;
+    
+    const midLat = (lat0 + lat1) / 2;
+    const midLng = (lng0 + lng1) / 2;
+    
+    const dLat = lat1 - lat0;
+    const dLng = lng1 - lng0;
+    
+    // Calculate a control point to bend the flight vector upwards (north)
+    const cLat = midLat + Math.abs(dLng) * curvature + 0.3;
+    const cLng = midLng - dLat * curvature;
+    
+    const points = [];
+    const steps = 30;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const mt = 1 - t;
+        const lat = mt * mt * lat0 + 2 * mt * t * cLat + t * t * lat1;
+        const lng = mt * mt * lng0 + 2 * mt * t * cLng + t * t * lng1;
+        points.push([lat, lng]);
+    }
+    return points;
+}
+
 export function calculateFullRoute(source, center, centerName) {
     const borderKey = getBestBorder(source, centerName);
     if (!borderKey) return null;
@@ -268,9 +377,19 @@ export function calculateFullRoute(source, center, centerName) {
     const seg2 = getBorderCrossSegment(borderKey);
     const seg3 = getNepalToCenterSegment(borderKey, center);
     
-    return {
+    const route = {
         borderName: BORDERS[borderKey].name,
         borderKey: borderKey,
         segments: [seg1, seg2, seg3]
     };
+    
+    // Automatically convert straight flight segments to curved Bezier paths
+    route.segments.forEach(seg => {
+        if (seg.mode === 'air' && seg.path.length === 2) {
+            seg.path = getBezierPoints(seg.path[0], seg.path[1]);
+        }
+    });
+    
+    return route;
 }
+

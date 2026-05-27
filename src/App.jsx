@@ -33,6 +33,11 @@ export default function App() {
   const [isMobileCentersOpen, setIsMobileCentersOpen] = useState(false);
   const [isMobileRoutingOpen, setIsMobileRoutingOpen] = useState(false);
 
+  // 6. Desktop sidebars collapsed state
+  const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
+  const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+
+
   // Sync theme to HTML attribute and watch system changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -124,7 +129,7 @@ export default function App() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <Header theme={theme} onThemeToggle={handleThemeToggle} />
       
-      <main className="app-layout">
+      <main className={`app-layout ${isLeftCollapsed ? 'left-collapsed' : ''} ${isRightCollapsed ? 'right-collapsed' : ''}`}>
         {/* Left Sidebar: Centers Directory */}
         <SidebarCenters 
           centers={filteredCenters}
@@ -139,17 +144,22 @@ export default function App() {
           setStatusFilter={setStatusFilter}
           isOpen={isMobileCentersOpen}
           onClose={() => setIsMobileCentersOpen(false)}
+          isCollapsed={isLeftCollapsed}
+          onToggleCollapse={() => setIsLeftCollapsed(!isLeftCollapsed)}
         />
         
         {/* Center Panel: Map */}
         <MapViewport 
           centers={filteredCenters}
+          allCenters={centers}
           selectedCenter={selectedCenter}
           onSelectCenter={setSelectedCenter}
           sourceCity={sourceCity}
           setSourceCity={setSourceCity}
           targetCenter={targetCenter}
           theme={theme}
+          isLeftCollapsed={isLeftCollapsed}
+          isRightCollapsed={isRightCollapsed}
         />
         
         {/* Right Sidebar: Route Planner & Guides */}
@@ -163,7 +173,37 @@ export default function App() {
           onSelectCenter={setSelectedCenter}
           isOpen={isMobileRoutingOpen}
           onClose={() => setIsMobileRoutingOpen(false)}
+          isCollapsed={isRightCollapsed}
+          onToggleCollapse={() => setIsRightCollapsed(!isRightCollapsed)}
         />
+
+        {/* Floating Expand Buttons (visible on desktop when sidebars are collapsed) */}
+        {isLeftCollapsed && (
+          <button 
+            className="floating-expand-btn expand-left"
+            onClick={() => setIsLeftCollapsed(false)}
+            title="Expand Centers List"
+            aria-label="Expand Centers List"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        )}
+
+        {isRightCollapsed && (
+          <button 
+            className="floating-expand-btn expand-right"
+            onClick={() => setIsRightCollapsed(false)}
+            title="Expand Route Planner"
+            aria-label="Expand Route Planner"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+        )}
+
 
         {/* Floating Mobile Action Buttons */}
         <div className="mobile-controls">

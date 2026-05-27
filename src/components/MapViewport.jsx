@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { CITIES, BORDERS, calculateFullRoute } from '../utils/routing';
 
@@ -26,6 +26,15 @@ function createMarkerIcon(type, size = 30) {
         </svg>
       </div>
     `;
+  } else if (type === 'airport') {
+    className += ' marker-airport';
+    innerHTML = `
+      <div class="marker-airport-inner">
+        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="currentColor" style="color: #0275d8;">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5l-2-1.5v-5.5l8 2.5z"/>
+        </svg>
+      </div>
+    `;
   } else if (type === 'city') {
     className += ' marker-city';
     innerHTML = `
@@ -46,14 +55,81 @@ function createMarkerIcon(type, size = 30) {
   });
 }
 
+// Calculate the midpoint of a coordinates path array
+function getPolylineMidpoint(path) {
+  if (!path || path.length === 0) return null;
+  if (path.length === 2) {
+    return [
+      (path[0][0] + path[1][0]) / 2,
+      (path[0][1] + path[1][1]) / 2
+    ];
+  }
+  return path[Math.floor(path.length / 2)];
+}
+
+// Build a small circular div icon with standard SVG transit symbols
+function createTransitBadgeIcon(mode) {
+  let bgColor = '#d9534f';
+  let svgIcon = '';
+  
+  if (mode === 'rail') {
+    bgColor = '#222222'; // Dark grey for rail
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+        <path d="M12 2c-4 0-7 2-7 6v6.5C5 17.5 7 19 9.5 20l.5.5v1.5c0 .3.2.5.5.5h3c.3 0 .5-.2.5-.5v-1.5l.5-.5c2.5-1 4.5-2.5 4.5-4V9.5c0-4-3-6-7-6zm-3.5 11c-.8 0-1.5-.7-1.5-1.5S7.7 9 8.5 9s1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/>
+      </svg>
+    `;
+  } else if (mode === 'air') {
+    bgColor = '#0275d8'; // Blue for plane
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="transform: rotate(45deg);">
+        <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5l-2-1.5v-5.5l8 2.5z"/>
+      </svg>
+    `;
+  } else {
+    // Road / Bus (Red)
+    bgColor = '#d9534f';
+    svgIcon = `
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+        <path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 001 1h1a1 1 0 001-1v-1h8v1a1 1 0 001 1h1a1 1 0 001-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM6 6h12v4H6V6z"/>
+      </svg>
+    `;
+  }
+  
+  return L.divIcon({
+    html: `
+      <div style="
+        background-color: ${bgColor};
+        border: 2px solid white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        color: white;
+      ">
+        ${svgIcon}
+      </div>
+    `,
+    className: 'route-badge-marker',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11]
+  });
+}
+
 export default function MapViewport({
   centers,
+  allCenters,
   selectedCenter,
   onSelectCenter,
   sourceCity,
   setSourceCity,
   targetCenter,
-  theme
+  theme,
+  isLeftCollapsed,
+  isRightCollapsed
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -63,6 +139,19 @@ export default function MapViewport({
   const centerMarkersRef = useRef([]);
   const staticMarkersRef = useRef({ cities: [], borders: [] });
   const activePolylinesRef = useRef([]);
+
+  // Legend Collapse State
+  const [isLegendCollapsed, setIsLegendCollapsed] = useState(false);
+
+  // Invalidate Map layout size after sidebar transition completes
+  useEffect(() => {
+    if (mapRef.current) {
+      const timer = setTimeout(() => {
+        mapRef.current.invalidateSize({ animate: true });
+      }, 320);
+      return () => clearTimeout(timer);
+    }
+  }, [isLeftCollapsed, isRightCollapsed]);
 
   // 1. Initialize Map Container (runs once)
   useEffect(() => {
@@ -94,8 +183,9 @@ export default function MapViewport({
     // Plot Static Borders
     const borderMarkers = [];
     Object.values(BORDERS).forEach(border => {
+      const isAirport = border.name.includes("Airport");
       const marker = L.marker([border.lat, border.lng], {
-        icon: createMarkerIcon('border', 28)
+        icon: createMarkerIcon(isAirport ? 'airport' : 'border', 28)
       }).addTo(leafletMap);
       
       marker.bindPopup(`<h4>${border.name}</h4><p class="popup-details">${border.desc}</p>`);
@@ -129,7 +219,7 @@ export default function MapViewport({
     }).addTo(mapRef.current);
   }, [theme]);
 
-  // 3. Sync Dynamic Centers (plot whenever filters change)
+  // 3. Sync Dynamic Centers (plot whenever filters change or route changes)
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -137,8 +227,17 @@ export default function MapViewport({
     centerMarkersRef.current.forEach(m => mapRef.current.removeLayer(m.marker));
     centerMarkersRef.current = [];
 
+    const isRouteActive = !!(sourceCity && targetCenter);
+    const targetCenterObj = isRouteActive
+      ? (allCenters || centers).find(c => c.center_name === targetCenter)
+      : null;
+
+    const centersToShow = isRouteActive && targetCenterObj
+      ? [targetCenterObj]
+      : centers;
+
     // Plot active ones
-    const newMarkers = centers.map(center => {
+    const newMarkers = centersToShow.map(center => {
       const marker = L.marker([center.latitude, center.longitude], {
         icon: createMarkerIcon('center', 30)
       }).addTo(mapRef.current);
@@ -157,7 +256,7 @@ export default function MapViewport({
     });
 
     centerMarkersRef.current = newMarkers;
-  }, [centers, onSelectCenter]);
+  }, [centers, allCenters, onSelectCenter, sourceCity, targetCenter]);
 
   // 4. Handle Center flying details
   useEffect(() => {
@@ -191,7 +290,7 @@ export default function MapViewport({
 
     if (!sourceCity || !targetCenter) return;
 
-    const centerObj = centers.find(c => c.center_name === targetCenter);
+    const centerObj = (allCenters || centers).find(c => c.center_name === targetCenter);
     if (!centerObj) return;
 
     const route = calculateFullRoute(sourceCity, centerObj, targetCenter);
@@ -211,7 +310,7 @@ export default function MapViewport({
     };
 
     // Draw paths
-    route.segments.forEach(seg => {
+    route.segments.forEach((seg, idx) => {
       const line = L.polyline(seg.path, {
         color: getColor(seg.mode),
         weight: 4,
@@ -219,6 +318,18 @@ export default function MapViewport({
         className: `${getClassName(seg.mode)} route-line-animated`
       }).addTo(mapRef.current);
       activePolylinesRef.current.push(line);
+
+      // Add a small transit mode badge at the midpoint of each segment (skip border crossing index 1)
+      if (idx !== 1) {
+        const midpoint = getPolylineMidpoint(seg.path);
+        if (midpoint) {
+          const badgeMarker = L.marker(midpoint, {
+            icon: createTransitBadgeIcon(seg.mode),
+            interactive: false
+          }).addTo(mapRef.current);
+          activePolylinesRef.current.push(badgeMarker);
+        }
+      }
     });
 
     // Zoom to fit bounds
@@ -239,39 +350,97 @@ export default function MapViewport({
     addPulse(BORDERS[route.borderKey].name, staticMarkersRef.current.borders);
     addPulse(targetCenter, centerMarkersRef.current);
 
-  }, [sourceCity, targetCenter, centers]);
+  }, [sourceCity, targetCenter, allCenters, centers]);
+
+  // 6. Sync visibility of static city and border markers based on active route
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const isRouteActive = !!(sourceCity && targetCenter);
+    let activeBorderKey = null;
+
+    if (isRouteActive) {
+      const centerObj = (allCenters || centers).find(c => c.center_name === targetCenter);
+      if (centerObj) {
+        const route = calculateFullRoute(sourceCity, centerObj, targetCenter);
+        if (route) {
+          activeBorderKey = route.borderKey;
+        }
+      }
+    }
+
+    // Update cities visibility
+    staticMarkersRef.current.cities.forEach(({ name, marker }) => {
+      const shouldBeVisible = !isRouteActive || name === sourceCity;
+      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
+
+      if (shouldBeVisible && !isCurrentlyOnMap) {
+        marker.addTo(mapRef.current);
+      } else if (!shouldBeVisible && isCurrentlyOnMap) {
+        mapRef.current.removeLayer(marker);
+      }
+    });
+
+    // Update borders visibility
+    staticMarkersRef.current.borders.forEach(({ name, marker }) => {
+      const activeBorderName = activeBorderKey ? BORDERS[activeBorderKey]?.name : null;
+      const shouldBeVisible = !isRouteActive || name === activeBorderName;
+      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
+
+      if (shouldBeVisible && !isCurrentlyOnMap) {
+        marker.addTo(mapRef.current);
+      } else if (!shouldBeVisible && isCurrentlyOnMap) {
+        mapRef.current.removeLayer(marker);
+      }
+    });
+  }, [sourceCity, targetCenter, allCenters, centers]);
 
   return (
     <section className="map-container" id="map-section">
       <div id="map" ref={mapContainerRef}></div>
       
       {/* Legend Card Overlay */}
-      <div className="map-legend glassmorphic">
-        <h4 className="legend-title">Route Guide</h4>
-        <div className="legend-items">
-          <div className="legend-item">
-            <span className="legend-line line-road"></span>
-            <span>Roadways</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-line line-rail"></span>
-            <span>Railways</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-line line-air"></span>
-            <span>Airways</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-dot dot-center"></span>
-            <span>Vipassana Centers</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-dot dot-border"></span>
-            <span>Border Crossings</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-dot dot-city"></span>
-            <span>Indian Hubs</span>
+      <div className={`map-legend glassmorphic ${isLegendCollapsed ? 'collapsed' : ''}`}>
+        <div className="legend-header" onClick={() => setIsLegendCollapsed(!isLegendCollapsed)}>
+          <h4 className="legend-title" style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>
+            🗺️ Route Guide
+          </h4>
+          <button 
+            className="legend-toggle-btn" 
+            aria-label={isLegendCollapsed ? "Expand Legend" : "Collapse Legend"}
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: isLegendCollapsed ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+        
+        <div className="legend-content">
+          <div className="legend-items">
+            <div className="legend-item">
+              <span className="legend-line line-road"></span>
+              <span>Roadways</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-line line-rail"></span>
+              <span>Railways</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-line line-air"></span>
+              <span>Airways</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot dot-center"></span>
+              <span>Vipassana Centers</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot dot-border"></span>
+              <span>Border Crossings</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot dot-city"></span>
+              <span>Indian Hubs</span>
+            </div>
           </div>
         </div>
       </div>

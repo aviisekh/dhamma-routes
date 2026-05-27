@@ -10,10 +10,21 @@ export default function SidebarRouting({
   setTargetCenter,
   onSelectCenter,
   isOpen,
-  onClose
+  onClose,
+  isCollapsed,
+  onToggleCollapse
 }) {
   const [activeTab, setActiveTab] = useState('routing');
   const [routeInfo, setRouteInfo] = useState(null);
+
+  const handleCollapseClick = () => {
+    if (window.innerWidth <= 992) {
+      if (onClose) onClose();
+    } else {
+      if (onToggleCollapse) onToggleCollapse();
+    }
+  };
+
 
   // Re-calculate route whenever city or center selection changes
   useEffect(() => {
@@ -84,6 +95,16 @@ export default function SidebarRouting({
             aria-selected={activeTab === 'info'}
           >
             Useful Info
+          </button>
+          <button 
+            className="sidebar-tab-toggle-btn"
+            onClick={handleCollapseClick}
+            title="Collapse panel"
+            aria-label="Collapse panel"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </button>
         </div>
 
@@ -237,6 +258,11 @@ export default function SidebarRouting({
                     <h4>4. Rupaidiha / Nepalgunj Border</h4>
                     <p><strong>Primary Transit for:</strong> Dang, Surkhet, Nepalgunj.</p>
                     <p><strong>Nearest Indian Rail:</strong> Bahraich or Lucknow. Standard route is to travel from Lucknow to Rupaidiha by bus/taxi.</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>5. Tribhuvan International Airport (KTM) - Kathmandu</h4>
+                    <p><strong>Primary Transit for:</strong> Kathmandu Valley, Pokhara, Lukla, Chitwan, Dhamma Tarai.</p>
+                    <p><strong>Travel Details:</strong> Direct flight hub for travelers arriving from distant cities (Mumbai, Bengaluru, Chennai, Hyderabad, etc.). Features standard customs and international immigration checks.</p>
                   </div>
                 </div>
 
