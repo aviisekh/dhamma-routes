@@ -60,11 +60,8 @@ export default function SidebarRouting({
   const handleTargetChange = (e) => {
     const val = e.target.value;
     setTargetCenter(val);
-    if (val) {
-      const centerObj = centers.find(c => c.center_name === val);
-      if (centerObj && onSelectCenter) {
-        onSelectCenter(centerObj);
-      }
+    if (onSelectCenter) {
+      onSelectCenter(null);
     }
   };
 
@@ -154,6 +151,26 @@ export default function SidebarRouting({
                     )}
                   </select>
                 </div>
+
+                {(sourceCity || targetCenter) && (
+                  <button 
+                    className="planner-clear-btn" 
+                    onClick={() => {
+                      setSourceCity('');
+                      setTargetCenter('');
+                      if (onSelectCenter) {
+                        onSelectCenter(null);
+                      }
+                    }}
+                    title="Clear route planning selections"
+                  >
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '6px' }}>
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Clear Route
+                  </button>
+                )}
               </div>
 
               {/* Routing Results Container */}

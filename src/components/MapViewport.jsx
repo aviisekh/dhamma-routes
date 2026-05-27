@@ -11,9 +11,11 @@ function createMarkerIcon(type, size = 30) {
     className += ' marker-center';
     innerHTML = `
       <div class="marker-center-inner">
-        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-15a1 1 0 011 1v4a1 1 0 01-2 0V6a1 1 0 011-1zm0 12a1 1 0 011 1v1a1 1 0 01-2 0v-1a1 1 0 011-1zm-6-6a1 1 0 011-1h4a1 1 0 010 2H7a1 1 0 01-1-1zm12 0a1 1 0 011-1h1a1 1 0 010 2h-1a1 1 0 01-1-1z"/>
+        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="2.5"/>
+          <path d="M9 10c0-1.5 1.5-2 3-2s3 .5 3 2v4c0 1.5-1.5 2-3 2s-3-.5-3-2v-4z"/>
+          <path d="M5 19c0-2.5 3-3.5 7-3.5s7 1 7 3.5"/>
+          <path d="M3 21h18"/>
         </svg>
       </div>
     `;
@@ -35,8 +37,14 @@ function createMarkerIcon(type, size = 30) {
     className += ' marker-city';
     innerHTML = `
       <div class="marker-city-inner">
-        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 15.5C4 14.1 8 13 12 13s8 1.1 8 2.5V18c0 1-2 2-8 2s-8-1-8-2v-2.5zm8-12c-4 0-7 2-7 6v6.5C5 17.5 7 19 9.5 20l.5.5v1.5c0 .3.2.5.5.5h3c.3 0 .5-.2.5-.5v-1.5l.5-.5c2.5-1 4.5-2.5 4.5-4V9.5c0-4-3-6-7-6zm-3.5 11c-.8 0-1.5-.7-1.5-1.5S7.7 9 8.5 9s1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/>
+        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18"/>
+          <path d="M5 21V7l5-4v14"/>
+          <path d="M19 21V11l-5-3v13"/>
+          <path d="M7 11h1"/>
+          <path d="M7 15h1"/>
+          <path d="M16 12h1"/>
+          <path d="M16 16h1"/>
         </svg>
       </div>
     `;
@@ -135,6 +143,7 @@ export default function MapViewport({
   const centerMarkersRef = useRef([]);
   const staticMarkersRef = useRef({ cities: [], borders: [] });
   const activePolylinesRef = useRef([]);
+  const isInitialRenderRef = useRef(true);
 
   // Legend Collapse State
   const [isLegendCollapsed, setIsLegendCollapsed] = useState(false);
@@ -268,6 +277,20 @@ export default function MapViewport({
     }
   }, [selectedCenter]);
 
+  // 4b. Reset map view when all selections are cleared
+  useEffect(() => {
+    if (!mapRef.current) return;
+    
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false;
+      return;
+    }
+
+    if (!selectedCenter && !sourceCity && !targetCenter) {
+      mapRef.current.flyTo([27.5, 84.2], 7);
+    }
+  }, [selectedCenter, sourceCity, targetCenter]);
+
   // 5. Draw Animated Routes & Sync Marker Visibility
   useEffect(() => {
     if (!mapRef.current) return;
@@ -333,6 +356,34 @@ export default function MapViewport({
       }
     });
 
+    // Helper to apply pulse effect to active markers (ensuring the element is loaded in DOM)
+    const addPulseClass = (marker) => {
+      const el = marker.getElement();
+      if (el) {
+        el.classList.add('marker-selected-pulse');
+      } else {
+        setTimeout(() => {
+          marker.getElement()?.classList.add('marker-selected-pulse');
+        }, 50);
+      }
+    };
+
+    // Pulse the source city if selected
+    if (sourceCity) {
+      const startCityMatch = staticMarkersRef.current.cities.find(c => c.name === sourceCity);
+      if (startCityMatch) {
+        addPulseClass(startCityMatch.marker);
+      }
+    }
+
+    // Pulse the target center if selected
+    if (targetCenter) {
+      const targetCenterMatch = centerMarkersRef.current.find(c => c.name === targetCenter);
+      if (targetCenterMatch) {
+        addPulseClass(targetCenterMatch.marker);
+      }
+    }
+
     if (!isRouteActive || !route || !centerObj) return;
 
     // Setup active styles
@@ -379,31 +430,10 @@ export default function MapViewport({
     ]);
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
 
-    // Apply pulse effect to active markers (ensuring the element is loaded in DOM)
-    const addPulseClass = (marker) => {
-      const el = marker.getElement();
-      if (el) {
-        el.classList.add('marker-selected-pulse');
-      } else {
-        setTimeout(() => {
-          marker.getElement()?.classList.add('marker-selected-pulse');
-        }, 50);
-      }
-    };
-
-    const startCityMatch = staticMarkersRef.current.cities.find(c => c.name === sourceCity);
-    if (startCityMatch) {
-      addPulseClass(startCityMatch.marker);
-    }
-
+    // Pulse the border crossing
     const borderMatch = staticMarkersRef.current.borders.find(b => b.name === BORDERS[route.borderKey].name);
     if (borderMatch) {
       addPulseClass(borderMatch.marker);
-    }
-
-    const targetCenterMatch = centerMarkersRef.current.find(c => c.name === targetCenter);
-    if (targetCenterMatch) {
-      addPulseClass(targetCenterMatch.marker);
     }
 
   }, [sourceCity, targetCenter, allCenters, centers]);
