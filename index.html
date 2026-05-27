@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22none%22 stroke=%22%23cda052%22 stroke-width=%224%22/><circle cx=%2250%22 cy=%2250%22 r=%2210%22 fill=%22none%22 stroke=%22%23cda052%22 stroke-width=%223%22/><circle cx=%2250%22 cy=%2250%22 r=%223%22 fill=%22%23cda052%22/><line x1=%2250%22 y1=%225%22 x2=%2250%22 y2=%2295%22 stroke=%22%23cda052%22 stroke-width=%223%22/><line x1=%225%22 y1=%2250%22 x2=%2295%22 y2=%2250%22 stroke=%22%23cda052%22 stroke-width=%223%22/><line x1=%2218.2%22 y1=%2218.2%22 x2=%2281.8%22 y2=%2281.8%22 stroke=%22%23cda052%22 stroke-width=%223%22/><line x1=%2281.8%22 y1=%2218.2%22 x2=%2218.2%22 y2=%2281.8%22 stroke=%22%23cda052%22 stroke-width=%223%22/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vipassana Centers in Nepal - Interactive Travel Map & Guide</title>
+    
+    <meta name="description" content="An interactive, map-based travel guide helping meditators travel from major Indian cities through various border transits to Vipassana centers across Nepal." />
+    <meta name="keywords" content="Vipassana Nepal, travel to Nepal, Dhamma Shringa, Sunauli border, Raxaul border, Gorakhpur to Nepal, meditation centers Nepal" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Prevents Flash of Unstyled Content (FOUC) for Dark Mode -->
+    <script>
+      {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+          document.querySelector('meta[name="color-scheme"]').content = savedTheme === "dark" ? "dark" : "light";
+        }
+      }
+    </script>
+
+    <!-- Google Fonts: Outfit (headings) & Inter (body text) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet.js Map Library CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script type="module" crossorigin src="/dhamma-routes/assets/index-rT6OFzgv.js"></script>
+    <link rel="stylesheet" crossorigin href="/dhamma-routes/assets/index-C-o-wg57.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
