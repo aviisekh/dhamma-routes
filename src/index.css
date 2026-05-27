@@ -1934,7 +1934,7 @@ input:checked + .slider:before {
 
     .mobile-controls {
         position: absolute;
-        bottom: 24px;
+        bottom: 40px;
         right: 24px;
         display: flex;
         flex-direction: column;
@@ -1979,7 +1979,7 @@ input:checked + .slider:before {
     }
     
     .map-legend {
-        bottom: 24px;
+        bottom: 40px;
         left: 24px;
         width: 180px;
         padding: 10px;
