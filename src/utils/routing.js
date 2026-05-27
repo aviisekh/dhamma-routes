@@ -15,10 +15,13 @@ export const CITIES = {
 
 export const BORDERS = {
     "Banbasa": { name: "Banbasa Border", lat: 28.9882, lng: 80.1472, desc: "Banbasa (India) / Mahendranagar (Nepal) Crossing" },
+    "Gauriphanta": { name: "Gauriphanta Border", lat: 28.6948, lng: 80.6120, desc: "Gauriphanta (India) / Dhangadhi (Nepal) Crossing" },
     "Rupaidiha": { name: "Rupaidiha Border", lat: 28.0010, lng: 81.6210, desc: "Rupaidiha (India) / Nepalgunj (Nepal) Crossing" },
+    "Barhni": { name: "Barhni Border", lat: 27.5255, lng: 82.8790, desc: "Barhni (India) / Krishnanagar (Nepal) Crossing" },
     "Sunauli": { name: "Sunauli Border", lat: 27.4385, lng: 83.4681, desc: "Sunauli (India) / Belahiya (Nepal) Crossing" },
     "Raxaul": { name: "Raxaul Border", lat: 27.0016, lng: 84.8715, desc: "Raxaul (India) / Birgunj (Nepal) Crossing" },
     "Jaynagar": { name: "Jaynagar Border", lat: 26.6083, lng: 86.1362, desc: "Jaynagar (India) / Janakpur (Nepal) Crossing" },
+    "Jogbani": { name: "Jogbani Border", lat: 26.4101, lng: 87.2694, desc: "Jogbani (India) / Biratnagar (Nepal) Crossing" },
     "Panitanki": { name: "Panitanki Border", lat: 26.6385, lng: 88.1612, desc: "Panitanki (India) / Kakarbhitta (Nepal) Crossing" },
     "KTM": { name: "Kathmandu Airport (KTM)", lat: 27.6980, lng: 85.3590, desc: "Tribhuvan International Airport (KTM) Entry Port" }
 };
@@ -58,18 +61,33 @@ export function getBestBorder(source, centerName) {
         return "KTM";
     }
 
-    if (centerName.includes("Sudur Paschim")) return "Banbasa";
+    if (centerName.includes("Sudur Paschim")) {
+        if (source === "Lucknow") return "Gauriphanta";
+        return "Banbasa";
+    }
     
     if (centerName.includes("Surkhetta") || centerName.includes("Dang")) {
         if (source === "Delhi") return "Banbasa";
         return "Rupaidiha";
     }
     
-    if (centerName.includes("Ilam") || centerName.includes("Purbanchal") || centerName.includes("Lukla")) {
+    if (centerName.includes("Ilam") || centerName.includes("Lukla")) {
         return "Panitanki";
     }
+
+    if (centerName.includes("Purbanchal")) {
+        if (source === "Siliguri") return "Panitanki";
+        return "Jogbani";
+    }
     
-    if (centerName.includes("Lumbini") || centerName.includes("Debdaha") || centerName.includes("Kapilvastu") || centerName.includes("Palpa") || centerName.includes("Pokhara")) {
+    if (centerName.includes("Kapilvastu")) {
+        if (["Delhi", "Lucknow", "Gorakhpur"].includes(source)) {
+            return "Barhni";
+        }
+        return "Sunauli";
+    }
+
+    if (centerName.includes("Lumbini") || centerName.includes("Debdaha") || centerName.includes("Palpa") || centerName.includes("Pokhara")) {
         return "Sunauli";
     }
     
@@ -99,8 +117,8 @@ export function getIndiaToBorderSegment(source, borderKey) {
     
     let path = [startCoord, endCoord];
     let mode = 'road';
-    let label = '';
-    let desc = '';
+    let label;
+    let desc;
     
     const isDistant = ["Mumbai", "Bengaluru", "Chennai", "Hyderabad"].includes(source);
 
@@ -150,6 +168,18 @@ export function getIndiaToBorderSegment(source, borderKey) {
         mode = 'rail';
         label = 'Purnagiri Jan Shatabdi Express';
         desc = 'Board the daily Purnagiri Jan Shatabdi Express from Delhi Rohilla directly to Banbasa Station (approx. 7.5 hours). Alternatively, catch an overnight state transport bus from Anand Vihar ISBT to Banbasa.';
+    } else if (source === 'Delhi' && borderKey === 'Jogbani') {
+        mode = 'rail';
+        label = 'Seemanchal Express';
+        desc = 'Board the direct daily Seemanchal Express from Anand Vihar Terminal (Delhi) directly to Jogbani Station (approx. 24 hours). Jogbani railway station is right next to the border gate.';
+    } else if (source === 'Delhi' && borderKey === 'Barhni') {
+        mode = 'rail';
+        label = 'Champaran Humsafar Express';
+        desc = 'Board the Champaran Humsafar Express from Delhi to Barhni Station (approx. 14 hours). The station sits directly on the border crossing, making transit extremely simple.';
+    } else if (source === 'Delhi' && borderKey === 'Gauriphanta') {
+        mode = 'rail';
+        label = 'Train to Bareilly, then Road';
+        desc = 'Take a fast train from Delhi to Bareilly or Shahjahanpur (approx. 5-6 hours), then hire a taxi or board a local bus to Gauriphanta border via Palia Kalan (approx. 4 hours).';
     } else if (source === 'Varanasi' && borderKey === 'Sunauli') {
         const pivot = [26.76, 83.37];
         path = [startCoord, pivot, endCoord];
@@ -166,14 +196,30 @@ export function getIndiaToBorderSegment(source, borderKey) {
         mode = 'road';
         label = 'Direct UPSRTC Bus to Rupaidiha';
         desc = 'Take a direct UPSRTC bus from Lucknow Kaiserbagh bus park to Rupaidiha Border checkpost (approx. 4 hours). Cabs are also readily available.';
+    } else if (source === 'Lucknow' && borderKey === 'Barhni') {
+        mode = 'rail';
+        label = 'Direct Express Train / Highway Bus';
+        desc = 'Board a direct express train or take a UPSRTC state highway bus from Lucknow via Siddharthnagar to Barhni Station (approx. 5 hours, 230 km).';
+    } else if (source === 'Lucknow' && borderKey === 'Gauriphanta') {
+        mode = 'road';
+        label = 'Direct Road via Lakhimpur / Palia';
+        desc = 'Take a state transport bus (UPSRTC) or private cab from Lucknow via Lakhimpur Kheri and Palia Kalan to the Gauriphanta border gate (approx. 5.5 hours, 240 km).';
     } else if (source === 'Gorakhpur' && borderKey === 'Sunauli') {
         mode = 'road';
         label = 'Local Bus / Private Taxi';
         desc = 'Take a local passenger bus or shared taxi directly from Gorakhpur Railway Station to the Sunauli Border checkpost (approx. 2.5 hours, 80 km).';
+    } else if (source === 'Gorakhpur' && borderKey === 'Barhni') {
+        mode = 'rail';
+        label = 'Local Passenger DEMU Train';
+        desc = 'Take a local passenger DEMU train or bus from Gorakhpur Junction directly to Barhni Station (approx. 2.5 hours, 110 km).';
     } else if (source === 'Patna' && borderKey === 'Raxaul') {
         mode = 'rail';
         label = 'Patliputra - Raxaul Intercity Express';
         desc = 'Board the Intercity Express train from Patna to Raxaul Jn (approx. 5 hours) or take a direct state transport bus to the Raxaul border town.';
+    } else if (source === 'Patna' && borderKey === 'Jogbani') {
+        mode = 'rail';
+        label = 'Koshi Express / Intercity Train';
+        desc = 'Board a direct train (like the Koshi Express) from Patna Junction to Jogbani Station (approx. 7.5 hours). Jogbani Railway Station is under 300 meters from the border gate.';
     } else if (source === 'Kolkata' && borderKey === 'Raxaul') {
         mode = 'rail';
         label = 'Mithila Express / Howrah-Raxaul Express';
@@ -184,6 +230,10 @@ export function getIndiaToBorderSegment(source, borderKey) {
         mode = 'rail';
         label = 'Train to NJP/Siliguri, then Shared Jeep';
         desc = 'Take a fast train (e.g. Padatik Express) from Kolkata/Sealdah to New Jalpaiguri (NJP) (approx. 9-10 hours). From NJP, board a shared jeep or taxi to the Panitanki Border (approx. 1 hour, 35 km).';
+    } else if (source === 'Kolkata' && borderKey === 'Jogbani') {
+        mode = 'rail';
+        label = 'Howrah - Jogbani Express';
+        desc = 'Take the overnight Howrah-Jogbani Express from Howrah Junction directly to Jogbani Station (approx. 10 hours). It is the most convenient way to reach the border from West Bengal.';
     } else if (source === 'Siliguri' && borderKey === 'Panitanki') {
         mode = 'road';
         label = 'Shared Jeep / Local Bus';
@@ -192,6 +242,10 @@ export function getIndiaToBorderSegment(source, borderKey) {
         mode = 'rail';
         label = 'Local Rail / Road Transit';
         desc = 'Take a passenger train or local bus from Darbhanga to Jaynagar Border Station (approx. 1.5 - 2 hours).';
+    } else if (source === 'Darbhanga' && borderKey === 'Jogbani') {
+        mode = 'road';
+        label = 'NH27 Express Highway';
+        desc = 'Travel by bus or private taxi via the East-West Highway (NH27) to Forbesganj, and then proceed to Jogbani (approx. 4 hours, 180 km).';
     } else {
         label = `Transit to ${BORDERS[borderKey].name}`;
         desc = `Travel by train or road from ${source} to the ${BORDERS[borderKey].name} crossing. Check local timetables for the best connection.`;
@@ -205,7 +259,7 @@ export function getBorderCrossSegment(borderKey) {
     const start = [border.lat - 0.005, border.lng];
     const end = [border.lat + 0.005, border.lng];
     
-    let desc = '';
+    let desc;
     if (borderKey === 'Sunauli') {
         desc = 'Walk through the iconic Nepal-India Friendship Gate (approx. 500m) from Sunauli (India side) to Belahiya (Nepal side). Complete immigration checks at the respective country offices.';
     } else if (borderKey === 'Raxaul') {
@@ -216,6 +270,12 @@ export function getBorderCrossSegment(borderKey) {
         desc = 'Cross the border checkpost on foot or via local rickshaw (1 km) into Nepalgunj. Complete customs stamping.';
     } else if (borderKey === 'Banbasa') {
         desc = 'Travel across the Sharda River Barrage on a cycle rickshaw or walk (approx. 2 km) to enter Mahendranagar, Nepal. Note that heavy vehicles are only allowed during specific hours.';
+    } else if (borderKey === 'Jogbani') {
+        desc = 'Walk or take a cycle rickshaw across the border crossing gate from Jogbani (India) into Biratnagar (Nepal side, approx. 500m). Complete passport/identity checks at both customs checkpoints.';
+    } else if (borderKey === 'Barhni') {
+        desc = 'Walk across the border gate (approx. 200m) from Barhni Railway Station (India) to Krishnanagar Customs (Nepal). Complete immigration stamps and identity verification.';
+    } else if (borderKey === 'Gauriphanta') {
+        desc = 'Cross the border checkpost from Gauriphanta (India side) on foot or via auto-rickshaw into Dhangadhi (Nepal side). Present your ID card/passport for customs verification.';
     } else if (borderKey === 'KTM') {
         desc = 'Clear airport immigration and customs at Tribhuvan International Airport (KTM) in Kathmandu. Indian citizens require a valid passport or voter ID card; foreign nationals can obtain a visa-on-arrival (15/30/90 days).';
     } else {
@@ -236,8 +296,8 @@ export function getNepalToCenterSegment(borderKey, center) {
     
     let path = [startCoord, endCoord];
     let mode = 'road';
-    let label = '';
-    let desc = '';
+    let label;
+    let desc;
     
     const name = center.center_name;
     const isKathmanduCenter = name.includes("Nepal Vipassana Center") || 
@@ -295,8 +355,13 @@ export function getNepalToCenterSegment(borderKey, center) {
         label = 'Local Taxi / Bus via Butwal';
         desc = 'Debdaha is 30 km from the border. Take a taxi or local bus going towards Butwal, and transfer to Debdaha (approx. 45 mins).';
     } else if (name.includes("Kapilvastu")) {
-        label = 'Highway Bus / Cab';
-        desc = 'From Belahiya, take a bus heading west towards Taulihawa / Kapilvastu, or hire a direct taxi to Banganga, Madhuwandham (approx. 1.5 hours).';
+        if (borderKey === 'Barhni') {
+            label = 'Local Bus / Taxi to Taulihawa';
+            desc = 'From Krishnanagar customs gate, board a local bus or shared jeep heading east/north towards Taulihawa (approx. 45 mins, 25 km). The center is situated in Banganga, Madhuwandham.';
+        } else {
+            label = 'Highway Bus / Cab';
+            desc = 'From Belahiya (Sunauli), take a bus heading west towards Taulihawa / Kapilvastu, or hire a direct taxi to Banganga, Madhuwandham (approx. 1.5 hours).';
+        }
     } else if (name.includes("Palpa")) {
         label = 'Bus / Taxi via Siddhartha Highway';
         desc = 'Board a bus or taxi going north on the Siddhartha Highway towards Tansen, Palpa. The center is located about 7-8 km before reaching Tansen (approx. 2-3 hours).';
@@ -315,8 +380,13 @@ export function getNepalToCenterSegment(borderKey, center) {
         label = 'Local Rickshaw / Auto';
         desc = 'The center is located in Parwanipur, Birgunj. Take a local auto-rickshaw or taxi north from Birgunj custom point (approx. 15 mins, 9 km).';
     } else if (name.includes("Purbanchal")) {
-        label = 'East-West Highway Bus';
-        desc = 'From Kakarbhitta border, board any bus heading west along the East-West Highway. Get off at Itahari-8 (approx. 1.5 hours, 65 km).';
+        if (borderKey === 'Jogbani') {
+            label = 'Local Bus / Auto-rickshaw to Itahari';
+            desc = 'From Biratnagar border crossing, take a local auto-rickshaw to the main Biratnagar Bus Park (approx. 3 km). Board a local bus heading north to Itahari (approx. 45 mins, 22 km). Get off at Itahari-8, near the Purbanchal Vipassana Center.';
+        } else {
+            label = 'East-West Highway Bus';
+            desc = 'From Kakarbhitta border (Panitanki), board any bus heading west along the East-West Highway. Get off at Itahari-8 (approx. 1.5 hours, 65 km).';
+        }
     } else if (name.includes("Ilam")) {
         label = 'Shared Jeep via Mechi Highway';
         desc = 'Board a shared jeep or bus heading north on the Mechi Highway to Phikkal, Ilam. The center is in Gairigaun, Phikkal (approx. 2 hours).';
@@ -327,8 +397,13 @@ export function getNepalToCenterSegment(borderKey, center) {
         label = 'Highway Jeep / Bus';
         desc = 'From Nepalgunj, catch a bus or shared vehicle to Ghorahi, Dang (approx. 2.5 - 3 hours).';
     } else if (name.includes("Sudur Paschim")) {
-        label = 'Local Rickshaw / Auto';
-        desc = 'The center is located in Tilachaur-8, Mahendranagar. Just cross the Banbasa border and take a short 15-minute auto-rickshaw ride directly to the center.';
+        if (borderKey === 'Gauriphanta') {
+            label = 'Shared Jeep / Local Bus via East-West Highway';
+            desc = 'From Dhangadhi customs checkpoint, take a local auto-rickshaw to Dhangadhi Bus Park (5 km). Board a shared jeep or bus heading west along the East-West Highway to Mahendranagar (approx. 1 hour, 45 km). The center is in Tilachaur-8.';
+        } else {
+            label = 'Local Rickshaw / Auto';
+            desc = 'The center is located in Tilachaur-8, Mahendranagar. Just cross the Banbasa border and take a short 15-minute auto-rickshaw ride directly to the center.';
+        }
     } else if (name.includes("Lukla")) {
         mode = 'air';
         label = 'STOL Flight from Kathmandu';

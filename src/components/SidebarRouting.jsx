@@ -240,29 +240,64 @@ export default function SidebarRouting({
                 
                 <div className="crossing-list">
                   <div className="crossing-info-item">
-                    <h4>1. Sunauli / Belahiya Border</h4>
-                    <p><strong>Primary Transit for:</strong> Lumbini (30 mins), Pokhara (6-8h), Kathmandu (9-10h), Palpa, Kapilvastu.</p>
-                    <p><strong>Nearest Indian Rail:</strong> Gorakhpur Jn (GKP) - 80 km away. Regular buses and taxis are available from Gorakhpur station to Sunauli (approx. 2.5 to 3 hours).</p>
+                    <h4>1. Banbasa / Mahendranagar Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yaan, Mahendranagar) - 5 km away (15-min rickshaw ride).</p>
+                    <p><strong>Primary Transit for:</strong> Sudur Paschim (Mahendranagar - 15 mins).</p>
+                    <p><strong>Nearest Indian Rail:</strong> Banbasa (Uttarakhand) - 2.5 km away. Regular rickshaws run from the station to the Sharda River Barrage. Direct trains like Purnagiri Jan Shatabdi connect Delhi Rohilla to Banbasa.</p>
                   </div>
                   <div className="crossing-info-item">
-                    <h4>2. Raxaul / Birgunj Border</h4>
-                    <p><strong>Primary Transit for:</strong> Dhamma Tarai (Birgunj), Chitwan, Kathmandu, Lalitpur, Kirtipur.</p>
-                    <p><strong>Nearest Indian Rail:</strong> Raxaul Jn (RXL) - sits right on the border. Walk or take a cycle rickshaw to the customs check post, then take local transit into Birgunj town.</p>
+                    <h4>2. Gauriphanta / Dhangadhi Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yaan, Mahendranagar) - 50 km away (1-hour drive).</p>
+                    <p><strong>Primary Transit for:</strong> Sudur Paschim (Mahendranagar - 45 km), Surkhet.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Mailani Jn or Palia Kalan, though travelers generally take direct state transport buses or private taxis from Lucknow (5.5 hours, 240 km).</p>
                   </div>
                   <div className="crossing-info-item">
-                    <h4>3. Panitanki / Kakarbhitta Border</h4>
-                    <p><strong>Primary Transit for:</strong> Ilam, Purbanchal (Itahari), Lukla, Kathmandu.</p>
-                    <p><strong>Nearest Indian Rail:</strong> New Jalpaiguri (NJP) or Siliguri Jn (SGUJ) - 35 km away. Frequent shared jeeps/taxis connect NJP/Siliguri to Panitanki.</p>
-                  </div>
-                  <div className="crossing-info-item">
-                    <h4>4. Rupaidiha / Nepalgunj Border</h4>
+                    <h4>3. Rupaidiha / Nepalgunj Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Surkhetta Vipassana Center (Dhamma Surkhetta) - 110 km (3h drive), Dang Vipassana Center (Dhamma Parag) - 140 km (3.5h drive).</p>
                     <p><strong>Primary Transit for:</strong> Dang, Surkhet, Nepalgunj.</p>
-                    <p><strong>Nearest Indian Rail:</strong> Bahraich or Lucknow. Standard route is to travel from Lucknow to Rupaidiha by bus/taxi.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Gonda Jn or Bahraich. Most travelers take direct buses or private cabs from Kaiserbagh bus park in Lucknow directly to the border (4 hours, 180 km).</p>
                   </div>
                   <div className="crossing-info-item">
-                    <h4>5. Tribhuvan International Airport (KTM) - Kathmandu</h4>
-                    <p><strong>Primary Transit for:</strong> Kathmandu Valley, Pokhara, Lukla, Chitwan, Dhamma Tarai.</p>
-                    <p><strong>Travel Details:</strong> Direct flight hub for travelers arriving from distant cities (Mumbai, Bengaluru, Chennai, Hyderabad, etc.). Features standard customs and international immigration checks.</p>
+                    <h4>4. Barhni / Krishnanagar Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Kapilvastu Vipassana Center (Dhamma Nanadana, Banganga) - 25 km away (45-min drive).</p>
+                    <p><strong>Primary Transit for:</strong> Kapilvastu (Taulihawa - 45 mins / 25 km).</p>
+                    <p><strong>Nearest Indian Rail:</strong> Barhni (UP) - sits directly on the border. Walk 200m from Barhni station platform to Krishnanagar Customs. Direct train connections from Delhi and Lucknow are available.</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>5. Sunauli / Belahiya Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Lumbini Vipassana Center (Dhamma Janani) - 22 km (30 mins), Debdaha Vipassana Center - 30 km (45 mins), Palpa Vipassana Center (Dhamma Sisa) - 70 km (2h), Kapilvastu Vipassana Center - 60 km (1.5h).</p>
+                    <p><strong>Primary Transit for:</strong> Lumbini (30 mins), Pokhara (6-8 hours), Palpa, Kapilvastu, Kathmandu.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Gorakhpur Jn (GKP) - 80 km away. Frequent local buses and taxis run from Gorakhpur station to Sunauli checkpost (approx. 2.5 hours).</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>6. Raxaul / Birgunj Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Dhamma Tarai Vipassan Center (Birgunj) - 9 km (15 mins), Chitwan Vipassana Center (Dhamma Chitwan) - 110 km (3h).</p>
+                    <p><strong>Primary Transit for:</strong> Dhamma Tarai (Birgunj), Chitwan, Kathmandu, Lalitpur.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Raxaul Jn (RXL) - right at the border. Walk or take a cycle rickshaw across the Miteri Bridge to Birgunj customs. Excellent direct express train connectivity from Patna, Kolkata, and Delhi.</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>7. Jaynagar / Janakpur Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Janakpur area and local centers (serves as a gateway for Dhanusha / Central-Eastern Nepal regional courses).</p>
+                    <p><strong>Primary Transit for:</strong> Janakpur, Dhanusha, and Central-Eastern Nepal.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Jaynagar (Bihar) - sits on the border. Home to the cross-border passenger railway linking Jaynagar to Janakpur (Kurtha), Nepal.</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>8. Jogbani / Biratnagar Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Purbanchal Vipassana Center (Dhamma Birat, Itahari) - 22 km away (45-min drive).</p>
+                    <p><strong>Primary Transit for:</strong> Purbanchal (Itahari - 45 mins / 22 km), Biratnagar.</p>
+                    <p><strong>Nearest Indian Rail:</strong> Jogbani (Bihar) - situated under 300 meters from the border customs gate. Features direct express trains from Kolkata, Patna, and Delhi (Seemanchal Express).</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>9. Panitanki / Kakarbhitta Border</h4>
+                    <p><strong>Nearest Center(s):</strong> Ilam Vipassana Center (Dhamma Suriyo) - 65 km (2h drive), Purbanchal Vipassana Center (Dhamma Birat) - 65 km (1.5h drive).</p>
+                    <p><strong>Primary Transit for:</strong> Ilam (2 hours), Purbanchal (Itahari), Lukla, Kathmandu.</p>
+                    <p><strong>Nearest Indian Rail:</strong> New Jalpaiguri (NJP) or Siliguri Jn - 35 km away. Frequent shared jeeps, taxis, and state buses connect NJP/Siliguri directly to the Panitanki gate.</p>
+                  </div>
+                  <div className="crossing-info-item">
+                    <h4>10. Tribhuvan International Airport (KTM) - Kathmandu</h4>
+                    <p><strong>Nearest Center(s):</strong> Nepal Vipassana Center (Dharmashringa, Budhanilkantha - 12 km), Kotdada Vipassana Center (Lalitpur - 18 km), Kirtipur Vipassana Center (15 km), Kakani Vipassana Center (25 km), Nakkhu Prison Vipassana Center (10 km).</p>
+                    <p><strong>Primary Transit for:</strong> Kathmandu Valley (Budhanilkantha, Lalitpur, Kirtipur, Kakani), Pokhara, Lukla, Chitwan.</p>
+                    <p><strong>Travel Details:</strong> Main aviation entry hub for travelers arriving from distant cities (Mumbai, Bengaluru, Chennai, Hyderabad, etc.). Offers domestic flights to regional airports like Pokhara, Bhairahawa, Simara, and Biratnagar.</p>
                   </div>
                 </div>
 

@@ -280,13 +280,22 @@ export default function MapViewport({
     activePolylinesRef.current.forEach(p => mapRef.current.removeLayer(p));
     activePolylinesRef.current = [];
 
-    // Clear old pulse animations
-    const clearPulses = () => {
-      staticMarkersRef.current.cities.forEach(c => c.marker.getElement()?.classList.remove('marker-selected-pulse'));
-      staticMarkersRef.current.borders.forEach(b => b.marker.getElement()?.classList.remove('marker-selected-pulse'));
-      centerMarkersRef.current.forEach(c => c.marker.getElement()?.classList.remove('marker-selected-pulse'));
+    // Clear old pulse animations and tooltips
+    const clearRouteVisuals = () => {
+      staticMarkersRef.current.cities.forEach(c => {
+        c.marker.getElement()?.classList.remove('marker-selected-pulse');
+        c.marker.unbindTooltip();
+      });
+      staticMarkersRef.current.borders.forEach(b => {
+        b.marker.getElement()?.classList.remove('marker-selected-pulse');
+        b.marker.unbindTooltip();
+      });
+      centerMarkersRef.current.forEach(c => {
+        c.marker.getElement()?.classList.remove('marker-selected-pulse');
+        c.marker.unbindTooltip();
+      });
     };
-    clearPulses();
+    clearRouteVisuals();
 
     if (!sourceCity || !targetCenter) return;
 
@@ -340,15 +349,21 @@ export default function MapViewport({
     ]);
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
 
-    // Apply pulse effect
-    const addPulse = (name, list) => {
-      const match = list.find(m => m.name === name);
-      if (match) match.marker.getElement()?.classList.add('marker-selected-pulse');
-    };
+    // Apply pulse effect to active markers
+    const startCityMatch = staticMarkersRef.current.cities.find(c => c.name === sourceCity);
+    if (startCityMatch) {
+      startCityMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+    }
 
-    addPulse(sourceCity, staticMarkersRef.current.cities);
-    addPulse(BORDERS[route.borderKey].name, staticMarkersRef.current.borders);
-    addPulse(targetCenter, centerMarkersRef.current);
+    const borderMatch = staticMarkersRef.current.borders.find(b => b.name === BORDERS[route.borderKey].name);
+    if (borderMatch) {
+      borderMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+    }
+
+    const targetCenterMatch = centerMarkersRef.current.find(c => c.name === targetCenter);
+    if (targetCenterMatch) {
+      targetCenterMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+    }
 
   }, [sourceCity, targetCenter, allCenters, centers]);
 
