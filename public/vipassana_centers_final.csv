@@ -1,0 +1,42 @@
+s_no,center_name,center_dhamma_name,address,established_date,contact_person,dhamma_hall_capacity_male,dhamma_hall_capacity_female,residence_capacity_male,residence_capacity_female,at_residence_male,at_residence_female,pagoda,remarks,extracted_city,geocoding_address,latitude,longitude
+1.0,Nepal Vipassana Center,Dharmashringa,"Budhanilkantha Municipality,
+Ward no. 1, 
+Muhanpokhari, Budhanilkantha, 
+Kathmandu(District)",1981,"Sushil Sah
+9813282200",120.0,120.0,170.0,100.0,Y,Y,Yes,,Kathmandu,"Kathmandu, Nepal",27.708317,85.3205817
+2.0,Kotdada Vipassana Center,Dhammagara,"Godawari-2, Kotdada
+Lalitpur
+",2018,"Kiran Maharjan
+9841482398",50.0,50.0,22.0,18.0,Y,Y,No,,Lalitpur,"Lalitpur, Nepal",27.6765635,85.3166069
+3.0,Kirtipur Vipassana Center,DhammaKitti,"Kirtipur Municipality
+Devkota-2, Kirtipur",2005/2006,9841337418,20.0,20.0,30.0,30.0,Y,Y,No,,Kirtipur,"Kirtipur, Nepal",27.676664,85.2782438
+4.0,Kakani Vipassana Center,Dhamma Nibha,"Kakani Rural Municipality-2
+Nuwakot",,,,,,,,,,Under Construction,Nuwakot,"Nuwakot, Nepal",27.9257991,85.248672
+5.0,Nakkhu Prison Vipassana Center,Dhammasaya,,2024,"Sushil Sah
+9813282200",80.0,,42.0,,Y,,No,"Only for Prisoners
+One Gender at a time",,"Nakkhu Prison Vipassana Center, Nepal",27.6648,85.324
+6.0,Lumbini Vipassana Center,Dhamma Janani,Lumbini ,2057 BS/2001AD,,75.0,75.0,24.0,24.0,Y,Y,Yes(85),,Lumbini,"Lumbini, Nepal",28.0654626,82.535642
+7.0,Debdaha Vipassana Center,,"Debdaha Municipality-8
+Lumbini",2023,,,,,,,,,Under Construction,Lumbini,"Lumbini, Nepal",28.0654626,82.535642
+8.0,Kapilvastu Vipassana Center,Dhamma Nanadana,"Banganga
+Madhuwandham
+Kapilbastu",2020,,25.0,25.0,18.0,12.0,,,No,,,"Kapilvastu Vipassana Center, Nepal",27.5517986,83.0468775
+9.0,Palpa Vipassana Center,Dhamma Sisa,"Madan Pokhara, 8,
+Tansen, ",,,25.0,25.0,18.0,22.0,,,No,,Pokhara,"Pokhara, Nepal",28.209538,83.991402
+10.0,Pokhara Vipassana Center,Dhamma Pokhara,"Pokhara -31, Kashki",2007,,25.0,25.0,16.0,16.0,Y,N,No,,Pokhara,"Pokhara, Nepal",28.209538,83.991402
+11.0,Chitwan Vipassana Center,Dhamma Chitwan,"Bharatpur Metromunicipality-16,
+Chitwan",,,35.0,35.0,19.0,15.0,Y,Y,36,,Chitwan,"Chitwan, Nepal",27.618086,84.4536201
+12.0,Dhamma Tarai Vipassan Center,Dhamma Tarai,"Parwanipur 
+Birgunj",1997,,30.0,30.0,20.0,12.0,Y,,Yes,,Birgunj,"Birgunj, Nepal",27.0135196,84.8763804
+13.0,Purbanchal Vipassana Center,Dhamma Birat,"Itahari-8, Sunsari ",2000,,30.0,30.0,30.0,30.0,,,Under Construction,,Itahari,"Itahari, Nepal",26.6622505,87.2748964
+14.0,Ilam Vipassana Center,Dhamma Suriyo,"Gairigaun, Phikkal, Illam ",2017,,15.0,15.0,10.0,10.0,,,,,,"Ilam Vipassana Center, Nepal",26.9023331,88.0838159
+15.0,Surkhetta Vipassana Center,Dhamma Surkhetta,"Katkuwa-8
+birendranagar
+Surkhet",2012,,25.0,25.0,28.0,15.0,Y,Y,,,Surkhet,"Surkhet, Nepal",28.6573817,81.5137825
+16.0,Dang Vipassana Center,Dhamma Parag,"Ghorahi-13,
+Dang
+",,,25.0,25.0,18.0,12.0,,,,,Dang,"Dang, Nepal",27.9788799,82.4684176
+17.0,Sudur Paschim Vipassana Center,Dhamma Yaan,"Tilachaur-8, 
+Mahendranagar",2023,,36.0,36.0,26.0,24.0,Y,Y,NO,,,"Sudur Paschim Vipassana Center, Nepal",28.96399,80.17715
+18.0,Lukla vipassana center,Dhamma sagar,"Khumbu Pasang Lhamu Rural Municipality-2
+Solukhumbu(Lukla)",2021,,35.0,35.0,12.0,8.0,Y,,,,,"Lukla vipassana center, Nepal",27.686899,86.729698
