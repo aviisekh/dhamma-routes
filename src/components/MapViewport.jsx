@@ -20,11 +20,7 @@ function createMarkerIcon(type, size = 30) {
   } else if (type === 'border') {
     className += ' marker-border';
     innerHTML = `
-      <div class="marker-border-inner">
-        <svg class="marker-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#d9534f" stroke-width="2.5">
-          <path d="M3 21h18M6 21V8a2 2 0 012-2h8a2 2 0 012 2v13M9 6V3a1 1 0 011-1h4a1 1 0 011 1v3"/>
-        </svg>
-      </div>
+      <div class="marker-border-inner"></div>
     `;
   } else if (type === 'airport') {
     className += ' marker-airport';
@@ -272,7 +268,7 @@ export default function MapViewport({
     }
   }, [selectedCenter]);
 
-  // 5. Draw Animated Routes
+  // 5. Draw Animated Routes & Sync Marker Visibility
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -297,13 +293,47 @@ export default function MapViewport({
     };
     clearRouteVisuals();
 
-    if (!sourceCity || !targetCenter) return;
+    const isRouteActive = !!(sourceCity && targetCenter);
+    let activeBorderKey = null;
+    let route = null;
+    let centerObj = null;
 
-    const centerObj = (allCenters || centers).find(c => c.center_name === targetCenter);
-    if (!centerObj) return;
+    if (isRouteActive) {
+      centerObj = (allCenters || centers).find(c => c.center_name === targetCenter);
+      if (centerObj) {
+        route = calculateFullRoute(sourceCity, centerObj, targetCenter);
+        if (route) {
+          activeBorderKey = route.borderKey;
+        }
+      }
+    }
 
-    const route = calculateFullRoute(sourceCity, centerObj, targetCenter);
-    if (!route) return;
+    // Update cities visibility
+    staticMarkersRef.current.cities.forEach(({ name, marker }) => {
+      const shouldBeVisible = !isRouteActive || name === sourceCity;
+      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
+
+      if (shouldBeVisible && !isCurrentlyOnMap) {
+        marker.addTo(mapRef.current);
+      } else if (!shouldBeVisible && isCurrentlyOnMap) {
+        mapRef.current.removeLayer(marker);
+      }
+    });
+
+    // Update borders visibility
+    staticMarkersRef.current.borders.forEach(({ name, marker }) => {
+      const activeBorderName = activeBorderKey ? BORDERS[activeBorderKey]?.name : null;
+      const shouldBeVisible = !isRouteActive || name === activeBorderName;
+      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
+
+      if (shouldBeVisible && !isCurrentlyOnMap) {
+        marker.addTo(mapRef.current);
+      } else if (!shouldBeVisible && isCurrentlyOnMap) {
+        mapRef.current.removeLayer(marker);
+      }
+    });
+
+    if (!isRouteActive || !route || !centerObj) return;
 
     // Setup active styles
     const getClassName = mode => {
@@ -349,65 +379,33 @@ export default function MapViewport({
     ]);
     mapRef.current.fitBounds(bounds, { padding: [50, 50] });
 
-    // Apply pulse effect to active markers
+    // Apply pulse effect to active markers (ensuring the element is loaded in DOM)
+    const addPulseClass = (marker) => {
+      const el = marker.getElement();
+      if (el) {
+        el.classList.add('marker-selected-pulse');
+      } else {
+        setTimeout(() => {
+          marker.getElement()?.classList.add('marker-selected-pulse');
+        }, 50);
+      }
+    };
+
     const startCityMatch = staticMarkersRef.current.cities.find(c => c.name === sourceCity);
     if (startCityMatch) {
-      startCityMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+      addPulseClass(startCityMatch.marker);
     }
 
     const borderMatch = staticMarkersRef.current.borders.find(b => b.name === BORDERS[route.borderKey].name);
     if (borderMatch) {
-      borderMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+      addPulseClass(borderMatch.marker);
     }
 
     const targetCenterMatch = centerMarkersRef.current.find(c => c.name === targetCenter);
     if (targetCenterMatch) {
-      targetCenterMatch.marker.getElement()?.classList.add('marker-selected-pulse');
+      addPulseClass(targetCenterMatch.marker);
     }
 
-  }, [sourceCity, targetCenter, allCenters, centers]);
-
-  // 6. Sync visibility of static city and border markers based on active route
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    const isRouteActive = !!(sourceCity && targetCenter);
-    let activeBorderKey = null;
-
-    if (isRouteActive) {
-      const centerObj = (allCenters || centers).find(c => c.center_name === targetCenter);
-      if (centerObj) {
-        const route = calculateFullRoute(sourceCity, centerObj, targetCenter);
-        if (route) {
-          activeBorderKey = route.borderKey;
-        }
-      }
-    }
-
-    // Update cities visibility
-    staticMarkersRef.current.cities.forEach(({ name, marker }) => {
-      const shouldBeVisible = !isRouteActive || name === sourceCity;
-      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
-
-      if (shouldBeVisible && !isCurrentlyOnMap) {
-        marker.addTo(mapRef.current);
-      } else if (!shouldBeVisible && isCurrentlyOnMap) {
-        mapRef.current.removeLayer(marker);
-      }
-    });
-
-    // Update borders visibility
-    staticMarkersRef.current.borders.forEach(({ name, marker }) => {
-      const activeBorderName = activeBorderKey ? BORDERS[activeBorderKey]?.name : null;
-      const shouldBeVisible = !isRouteActive || name === activeBorderName;
-      const isCurrentlyOnMap = mapRef.current.hasLayer(marker);
-
-      if (shouldBeVisible && !isCurrentlyOnMap) {
-        marker.addTo(mapRef.current);
-      } else if (!shouldBeVisible && isCurrentlyOnMap) {
-        mapRef.current.removeLayer(marker);
-      }
-    });
   }, [sourceCity, targetCenter, allCenters, centers]);
 
   return (
