@@ -260,13 +260,13 @@ export default function SidebarRouting({
                 <div className="crossing-list">
                   <div className="crossing-info-item">
                     <h4>1. Banbasa / Mahendranagar Border</h4>
-                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yaan, Mahendranagar) - 5 km away (15-min rickshaw ride).</p>
+                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yana, Mahendranagar) - 5 km away (15-min rickshaw ride).</p>
                     <p><strong>Primary Transit for:</strong> Sudur Paschim (Mahendranagar - 15 mins).</p>
                     <p><strong>Nearest Indian Rail:</strong> Banbasa (Uttarakhand) - 2.5 km away. Regular rickshaws run from the station to the Sharda River Barrage. Direct trains like Purnagiri Jan Shatabdi connect Delhi Rohilla to Banbasa.</p>
                   </div>
                   <div className="crossing-info-item">
                     <h4>2. Gauriphanta / Dhangadhi Border</h4>
-                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yaan, Mahendranagar) - 50 km away (1-hour drive).</p>
+                    <p><strong>Nearest Center(s):</strong> Sudur Paschim Vipassana Center (Dhamma Yana, Mahendranagar) - 50 km away (1-hour drive).</p>
                     <p><strong>Primary Transit for:</strong> Sudur Paschim (Mahendranagar - 45 km), Surkhet.</p>
                     <p><strong>Nearest Indian Rail:</strong> Mailani Jn or Palia Kalan, though travelers generally take direct state transport buses or private taxis from Lucknow (5.5 hours, 240 km).</p>
                   </div>

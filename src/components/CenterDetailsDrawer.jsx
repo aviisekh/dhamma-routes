@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function CenterDetailsDrawer({ center, onClose }) {
   const drawerRef = useRef(null);
+  const [copied, setCopied] = useState(false);
 
   // Focus the drawer for accessibility when it opens
   useEffect(() => {
@@ -51,7 +52,8 @@ export default function CenterDetailsDrawer({ center, onClose }) {
   const handleCopyContact = () => {
     if (center) {
       navigator.clipboard.writeText(`${center.center_name}\n${center.contact_person || ""}`);
-      alert("Contact details copied to clipboard!");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -87,8 +89,27 @@ export default function CenterDetailsDrawer({ center, onClose }) {
                 
                 <div className="info-row">
                   <div className="info-row-icon">📞</div>
-                  <div className="info-row-body">
-                    <h5>Contact</h5>
+                  <div className="info-row-body" style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <h5>Contact</h5>
+                      <button 
+                        className="copy-btn-inline" 
+                        onClick={handleCopyContact} 
+                        title="Copy Contact Details"
+                        aria-label="Copy Contact Details"
+                      >
+                        {copied ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="check-icon">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="copy-icon">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                     <p>{contactHtml}</p>
                   </div>
                 </div>
@@ -176,16 +197,13 @@ export default function CenterDetailsDrawer({ center, onClose }) {
                 
                 <div className="drawer-actions">
                   <a 
-                    href={`https://www.dhamma.org/en/schedules/sch${center.center_dhamma_name ? center.center_dhamma_name.toLowerCase().replace('dhamma', '') : ''}`} 
+                    href={center.center_url} 
                     target="_blank" 
                     className="btn btn-primary" 
                     rel="noopener noreferrer"
                   >
                     ☸️ Apply for Course
                   </a>
-                  <button className="btn btn-secondary" onClick={handleCopyContact}>
-                    📋 Copy Contact
-                  </button>
                 </div>
               </div>
             </div>

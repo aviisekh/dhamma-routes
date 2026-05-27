@@ -1525,8 +1525,8 @@ input:checked + .slider:before {
 .drawer-actions {
     margin-top: 24px;
     display: flex;
+    flex-direction: column;
     gap: 12px;
-    flex-wrap: wrap;
 }
 
 .btn {
@@ -1548,6 +1548,10 @@ input:checked + .slider:before {
 .btn-primary {
     background-color: var(--color-primary);
     color: #ffffff !important;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    box-sizing: border-box;
 }
 
 .btn-primary:hover {
@@ -1563,6 +1567,29 @@ input:checked + .slider:before {
 
 .btn-secondary:hover {
     background-color: var(--border-color);
+}
+
+.copy-btn-inline {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+    line-height: 1;
+}
+
+.copy-btn-inline:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.copy-btn-inline svg {
+    display: block;
 }
 
 .remarks-box {

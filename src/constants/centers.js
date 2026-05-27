@@ -17,7 +17,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Kathmandu",
         "geocoding_address": "Kathmandu, Nepal",
         "latitude": "27.708317",
-        "longitude": "85.3205817"
+        "longitude": "85.3205817",
+        "center_url": "https://www.dhamma.org/en/schedules/schshringa"
     },
     {
         "s_no": "2.0",
@@ -37,7 +38,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Lalitpur",
         "geocoding_address": "Lalitpur, Nepal",
         "latitude": "27.6765635",
-        "longitude": "85.3166069"
+        "longitude": "85.3166069",
+        "center": "https://www.dhamma.org/en/schedules/schgara"
     },
     {
         "s_no": "3.0",
@@ -57,7 +59,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Kirtipur",
         "geocoding_address": "Kirtipur, Nepal",
         "latitude": "27.676664",
-        "longitude": "85.2782438"
+        "longitude": "85.2782438",
+        "center": "https://www.dhamma.org/en/schedules/schkitti"
     },
     {
         "s_no": "4.0",
@@ -77,7 +80,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Nuwakot",
         "geocoding_address": "Nuwakot, Nepal",
         "latitude": "27.9257991",
-        "longitude": "85.248672"
+        "longitude": "85.248672",
+        "center": "https://www.dhamma.org/en/schedules/schnibha"
     },
     {
         "s_no": "5.0",
@@ -97,7 +101,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "",
         "geocoding_address": "Nakkhu Prison Vipassana Center, Nepal",
         "latitude": "27.6648",
-        "longitude": "85.324"
+        "longitude": "85.324",
+        "center": "https://www.dhamma.org/en/schedules/schsushil"
     },
     {
         "s_no": "6.0",
@@ -117,7 +122,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Lumbini",
         "geocoding_address": "Lumbini, Nepal",
         "latitude": "28.0654626",
-        "longitude": "82.535642"
+        "longitude": "82.535642",
+        "center": "https://www.dhamma.org/en/schedules/schjanani"
     },
     {
         "s_no": "7.0",
@@ -137,7 +143,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Lumbini",
         "geocoding_address": "Lumbini, Nepal",
         "latitude": "28.0654626",
-        "longitude": "82.535642"
+        "longitude": "82.535642",
+        "center": "https://www.dhamma.org/en/schedules/schdebdaha"
     },
     {
         "s_no": "8.0",
@@ -157,7 +164,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "",
         "geocoding_address": "Kapilvastu Vipassana Center, Nepal",
         "latitude": "27.5517986",
-        "longitude": "83.0468775"
+        "longitude": "83.0468775",
+        "center": "https://www.dhamma.org/en/schedules/schnanadana"
     },
     {
         "s_no": "9.0",
@@ -177,7 +185,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Pokhara",
         "geocoding_address": "Pokhara, Nepal",
         "latitude": "28.209538",
-        "longitude": "83.991402"
+        "longitude": "83.991402",
+        "center": "https://www.dhamma.org/en/schedules/chissisa"
     },
     {
         "s_no": "10.0",
@@ -197,7 +206,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Pokhara",
         "geocoding_address": "Pokhara, Nepal",
         "latitude": "28.209538",
-        "longitude": "83.991402"
+        "longitude": "83.991402",
+        "center": "https://www.dhamma.org/en/schedules/schpokhara"
     },
     {
         "s_no": "11.0",
@@ -217,7 +227,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Chitwan",
         "geocoding_address": "Chitwan, Nepal",
         "latitude": "27.618086",
-        "longitude": "84.4536201"
+        "longitude": "84.4536201",
+        "center": "https://www.dhamma.org/en/schedules/schchitwan"
     },
     {
         "s_no": "12.0",
@@ -237,7 +248,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Birgunj",
         "geocoding_address": "Birgunj, Nepal",
         "latitude": "27.0135196",
-        "longitude": "84.8763804"
+        "longitude": "84.8763804",
+        "center": "https://www.dhamma.org/en/schedules/schbirat"
     },
     {
         "s_no": "13.0",
@@ -257,7 +269,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Itahari",
         "geocoding_address": "Itahari, Nepal",
         "latitude": "26.6622505",
-        "longitude": "87.2748964"
+        "longitude": "87.2748964",
+        "center": "https://www.dhamma.org/en/schedules/schsuriyo"
     },
     {
         "s_no": "14.0",
@@ -277,7 +290,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "",
         "geocoding_address": "Ilam Vipassana Center, Nepal",
         "latitude": "26.9023331",
-        "longitude": "88.0838159"
+        "longitude": "88.0838159",
+        "center": "https://www.dhamma.org/en/schedules/schsuriyo"
     },
     {
         "s_no": "15.0",
@@ -297,7 +311,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Surkhet",
         "geocoding_address": "Surkhet, Nepal",
         "latitude": "28.6573817",
-        "longitude": "81.5137825"
+        "longitude": "81.5137825",
+        "center": "https://www.dhamma.org/en/schedules/schsurkhetta"
     },
     {
         "s_no": "16.0",
@@ -317,12 +332,13 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "Dang",
         "geocoding_address": "Dang, Nepal",
         "latitude": "27.9788799",
-        "longitude": "82.4684176"
+        "longitude": "82.4684176",
+        "center": "https://www.dhamma.org/en/schedules/schparag"
     },
     {
         "s_no": "17.0",
         "center_name": "Sudur Paschim Vipassana Center",
-        "center_dhamma_name": "Dhamma Yaan",
+        "center_dhamma_name": "Dhamma Yana",
         "address": "Tilachaur-8, \nMahendranagar",
         "established_date": "2023",
         "contact_person": "",
@@ -337,7 +353,8 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "",
         "geocoding_address": "Sudur Paschim Vipassana Center, Nepal",
         "latitude": "28.96399",
-        "longitude": "80.17715"
+        "longitude": "80.17715",
+        "center": "https://www.dhamma.org/en/schedules/schyanan"
     },
     {
         "s_no": "18.0",
@@ -357,6 +374,7 @@ export const VIPASSANA_CENTERS = [
         "extracted_city": "",
         "geocoding_address": "Lukla vipassana center, Nepal",
         "latitude": "27.686899",
-        "longitude": "86.729698"
+        "longitude": "86.729698",
+        "center": "https://www.dhamma.org/en/schedules/schsagar"
     }
 ];
