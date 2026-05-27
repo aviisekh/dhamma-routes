@@ -1821,11 +1821,7 @@ input:checked + .slider:before {
     }
     
     .tab-buttons {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-    
-    .sidebar-tab-toggle-btn {
-        display: none !important;
+        grid-template-columns: 1fr 1fr 1fr auto;
     }
 }
 
