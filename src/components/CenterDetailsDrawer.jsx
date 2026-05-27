@@ -148,7 +148,7 @@ export default function CenterDetailsDrawer({
                 <span className="drawer-center-dhamma">☸️ {center.center_dhamma_name || 'Dhamma Center'}</span>
               </div>
               <a 
-                href={center.center_url} 
+                href={center.center_url || center.center} 
                 target="_blank" 
                 className="btn-apply-course" 
                 rel="noopener noreferrer"

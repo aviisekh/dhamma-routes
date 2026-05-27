@@ -102,6 +102,23 @@ export default function SidebarRouting({
           if (onClose) onClose();
         }
       }
+    } else if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      // Horizontal swipe is dominant
+      if (diffX > 0) {
+        // Swipe LEFT (drag to the left to show the next tab)
+        if (activeTab === 'routing') {
+          setActiveTab('guide');
+        } else if (activeTab === 'guide') {
+          setActiveTab('info');
+        }
+      } else {
+        // Swipe RIGHT (drag to the right to show the previous tab)
+        if (activeTab === 'info') {
+          setActiveTab('guide');
+        } else if (activeTab === 'guide') {
+          setActiveTab('routing');
+        }
+      }
     }
   };
 

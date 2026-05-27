@@ -39,7 +39,7 @@ export const VIPASSANA_CENTERS = [
         "geocoding_address": "Lalitpur, Nepal",
         "latitude": "27.6765635",
         "longitude": "85.3166069",
-        "center": "https://www.dhamma.org/en/schedules/schgara"
+        "center": "https://www.dhamma.org/en/schedules/schagara"
     },
     {
         "s_no": "3.0",
@@ -354,7 +354,7 @@ export const VIPASSANA_CENTERS = [
         "geocoding_address": "Sudur Paschim Vipassana Center, Nepal",
         "latitude": "28.96399",
         "longitude": "80.17715",
-        "center": "https://www.dhamma.org/en/schedules/schyanan"
+        "center": "https://www.dhamma.org/en/schedules/schyana"
     },
     {
         "s_no": "18.0",
